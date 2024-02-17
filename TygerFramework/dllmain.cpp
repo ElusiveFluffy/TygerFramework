@@ -9,18 +9,18 @@
 namespace fs = std::filesystem;
 
 //Xinput DLL Pointer
-HMODULE g_xinput = 0;
+HMODULE pXInput = 0;
 
-bool load_xinput910() {
+bool Load_XInput9_1_0() {
     //Check if its already loaded
-    if (g_xinput) {
+    if (pXInput) {
         return true;
     }
 
     wchar_t buffer[MAX_PATH]{ 0 };
     if (GetSystemDirectoryW(buffer, MAX_PATH) != 0) {
         // Load the original XInput9_1_0.dll
-        if ((g_xinput = LoadLibraryW((std::wstring{ buffer } + L"\\XInput9_1_0.dll").c_str())) == NULL) {
+        if ((pXInput = LoadLibraryW((std::wstring{ buffer } + L"\\XInput9_1_0.dll").c_str())) == NULL) {
             return false;
         }
         return true;
@@ -36,8 +36,8 @@ EXTERN_C DWORD xinput_set_state(DWORD dwUserIndex, XINPUT_VIBRATION* pVibration)
     #pragma comment(linker, "/EXPORT:XInputSetState=xinput_set_state")
 
     //Make sure its loaded
-    load_xinput910();
-    return ((decltype(XInputSetState)*)GetProcAddress(g_xinput, "XInputSetState"))(dwUserIndex, pVibration);
+    Load_XInput9_1_0();
+    return ((decltype(XInputSetState)*)GetProcAddress(pXInput, "XInputSetState"))(dwUserIndex, pVibration);
 }
 
 //XInputGetState wrapper for xinput9.1.0.dll
@@ -47,8 +47,8 @@ EXTERN_C DWORD WINAPI xinput_get_state(DWORD dwUserIndex, XINPUT_STATE* pState) 
     #pragma comment(linker, "/EXPORT:XInputGetState=xinput_get_state")
 
     //Make sure its loaded
-    load_xinput910();
-    return ((decltype(XInputGetState)*)GetProcAddress(g_xinput, "XInputGetState"))(dwUserIndex, pState);
+    Load_XInput9_1_0();
+    return ((decltype(XInputGetState)*)GetProcAddress(pXInput, "XInputGetState"))(dwUserIndex, pState);
 }
 
 BOOL APIENTRY DllMain(HANDLE handle, DWORD reason, LPVOID reserved) {
