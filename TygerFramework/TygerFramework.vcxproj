@@ -71,7 +71,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <TargetName>Xinput9_1_0</TargetName>
+    <TargetName>XInput9_1_0</TargetName>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <VcpkgInstalledDir>
@@ -95,7 +95,7 @@
       <ModuleDefinitionFile>Source.def</ModuleDefinitionFile>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(OutDir)Xinput9_1_0.dll" "D:\SteamLibrary\steamapps\common\TY the Tasmanian Tiger\Xinput9_1_0.dll"</Command>
+      <Command>copy "$(OutDir)Xinput9_1_0.dll" "D:\SteamLibrary\steamapps\common\TY the Tasmanian Tiger\XInput9_1_0.dll"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copy outputted DLL to Ty directory</Message>
