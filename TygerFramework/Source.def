@@ -1,4 +1,4 @@
-LIBRARY TygerFramework
+LIBRARY XInput9_1_0
 
 EXPORTS
 XInputSetState=xinput_set_state
