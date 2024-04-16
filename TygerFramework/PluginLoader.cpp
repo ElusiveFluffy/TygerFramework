@@ -9,17 +9,15 @@ void PluginLoader::EarlyInit() try {
 
     std::ofstream pluginLog("PluginLoader.txt");
 
-    pluginLog << "Plugin Loader Early Initialization Started" << std::endl;
+    FrameworkInstance->LogMessage("[Plugin Loader] Early Initialization Started");
 
     fs::path pluginPath = TygerFramework::GetPluginDir();
     //Create it if it doesn't exist
     if (!fs::create_directories(pluginPath) && !fs::exists(pluginPath)) {
-        pluginLog << "Failed to Create Plugin Folder!" << std::endl;
+        FrameworkInstance->LogMessage("[Plugin Loader] Failed to Create Plugin Folder!", TygerFramework::Error);
         return;
     }
-    else{
-        pluginLog << "Loading Plugins From: " << pluginPath << std::endl;
-    }
+    FrameworkInstance->LogMessage("[Plugin Loader] Loading Plugins From : " + pluginPath.string());
 
     for (auto&& entry : fs::directory_iterator{ pluginPath }) {
         auto&& path = entry.path();
@@ -27,10 +25,10 @@ void PluginLoader::EarlyInit() try {
         if (path.has_extension() && path.extension() == ".dll") {
             auto module = LoadLibrary(path.c_str());
 
-            pluginLog << "Loading: " << path.filename().string() << std::endl;
+            FrameworkInstance->LogMessage("[Plugin Loader] Loading: " + path.filename().string());
 
             if (module == nullptr) {
-                pluginLog << "Failed to load plugin: " << path.filename().string() << std::endl;
+                FrameworkInstance->LogMessage("[Plugin Loader] Failed to Load Plugin: " + path.filename().string(), TygerFramework::Error);
                 continue;
             }
 
