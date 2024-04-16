@@ -1,5 +1,6 @@
 // dllmain.cpp : Defines the entry point for the DLL application.
 #include "pch.h"
+#include "PluginLoader.h"
 #include <iostream>
 #include <fstream>
 #include <filesystem>
@@ -53,18 +54,19 @@ EXTERN_C DWORD WINAPI xinput_get_state(DWORD dwUserIndex, XINPUT_STATE* pState) 
 
 BOOL APIENTRY DllMain(HANDLE handle, DWORD reason, LPVOID reserved) {
 
-    HMODULE hExe = GetModuleHandle(NULL);
     WCHAR fullPath[MAX_PATH]{ 0 };
-    GetModuleFileName(hExe, fullPath, MAX_PATH);
+    GetModuleFileName(NULL, fullPath, MAX_PATH);
     fs::path path(fullPath);
-    std::string filename = path.filename().string();
-    std::string rawname = filename.substr(0, filename.find_last_of("."));
 
     std::ofstream outfile("test.txt");
 
-    outfile << "Hello World! from " + rawname << std::endl;
+    outfile << "Hello World! from " << path.stem().string() << std::endl;
 
     outfile.close();
+
+    //TODO: Probably move this to its own thread so its not running on the same thread as the game (or just have it run on the same thread so then the game has to wait for the early initialization, and have a later initialization on a different thread)
+    PluginLoader loader{};
+    loader.EarlyInit();
 
     return TRUE;
 }
