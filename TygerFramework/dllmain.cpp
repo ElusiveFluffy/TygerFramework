@@ -55,10 +55,6 @@ EXTERN_C DWORD WINAPI xinput_get_state(DWORD dwUserIndex, XINPUT_STATE* pState) 
 
 BOOL APIENTRY DllMain(HANDLE handle, DWORD reason, LPVOID reserved) {
     if (reason == DLL_PROCESS_ATTACH) {
-        WCHAR fullPath[MAX_PATH]{ 0 };
-        GetModuleFileName(NULL, fullPath, MAX_PATH);
-        fs::path path(fullPath);
-
         FrameworkInstance = std::make_unique<TygerFramework>(GetModuleHandle(NULL));
         //Early intilization for the plugins before the game window shows, runs on the same startup thread as the game and the game will wait for this to complete
         FrameworkInstance->PluginLoader.EarlyInit();
