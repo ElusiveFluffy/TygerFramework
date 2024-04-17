@@ -7,8 +7,6 @@
 void PluginLoader::EarlyInit() try {
     namespace fs = std::filesystem;
 
-    std::ofstream pluginLog("PluginLoader.txt");
-
     FrameworkInstance->LogMessage("[Plugin Loader] Early Initialization Started");
 
     fs::path pluginPath = TygerFramework::GetPluginDir();
@@ -17,7 +15,7 @@ void PluginLoader::EarlyInit() try {
         FrameworkInstance->LogMessage("[Plugin Loader] Failed to Create Plugin Folder!", TygerFramework::Error);
         return;
     }
-    FrameworkInstance->LogMessage("[Plugin Loader] Loading Plugins From : " + pluginPath.string());
+    FrameworkInstance->LogMessage("[Plugin Loader] Loading Plugins From: " + pluginPath.string());
 
     for (auto&& entry : fs::directory_iterator{ pluginPath }) {
         auto&& path = entry.path();
@@ -35,12 +33,15 @@ void PluginLoader::EarlyInit() try {
             mPlugins.emplace(path.stem().string(), module);
         }
     }
-
-    pluginLog.close();
 }
 catch (const std::exception& e) {
-    
+    std::string message = "[Plugin Loader] Error Occured During Plugin Early Initilization: ";
+    message += e.what();
+    FrameworkInstance->LogMessage(message, TygerFramework::Error);
 }
 catch (...) {
+    FrameworkInstance->LogMessage("[Plugin Loader] Unhandled Exception Occured During Plugin Early Initilization", TygerFramework::Error);
+}
+
     
 }
