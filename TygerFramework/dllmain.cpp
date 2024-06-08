@@ -58,6 +58,7 @@ BOOL APIENTRY DllMain(HANDLE handle, DWORD reason, LPVOID reserved) {
         FrameworkInstance = std::make_unique<TygerFramework>(GetModuleHandle(NULL));
         //Early intilization for the plugins before the game window shows, runs on the same startup thread as the game and the game will wait for this to complete
         FrameworkInstance->PluginLoader.EarlyInit();
+        FrameworkInstance->PluginLoader.Initialize();
     }
 
     return TRUE;

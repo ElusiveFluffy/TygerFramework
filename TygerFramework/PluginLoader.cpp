@@ -4,6 +4,26 @@
 #include <fstream>
 #include <filesystem>
 
+namespace tygerFramework {
+    void LogPluginMessage(std::string message, LogLevel logType) {
+        FrameworkInstance->LogMessage("[Plugin] " + message, (TygerFramework::LogLevel)logType);
+    }
+
+    int WhichTyGame() {
+        return FrameworkInstance->WhichTyGame();
+    }
+}
+
+TygerFrameworkPluginFunctions pluginFunctions{
+    tygerFramework::LogPluginMessage,
+    tygerFramework::WhichTyGame
+};
+
+TygerFrameworkPluginInitializeParam pluginInitParam{
+    nullptr,
+    &pluginFunctions
+};
+
 void PluginLoader::EarlyInit() try {
     namespace fs = std::filesystem;
 
@@ -23,10 +43,10 @@ void PluginLoader::EarlyInit() try {
         if (path.has_extension() && path.extension() == ".dll") {
             auto module = LoadLibrary(path.c_str());
 
-            FrameworkInstance->LogMessage("[Plugin Loader] Loading: " + path.filename().string());
+            FrameworkInstance->LogMessage("[Plugin Loader] Loading: " + path.stem().string());
 
             if (module == nullptr) {
-                FrameworkInstance->LogMessage("[Plugin Loader] Failed to Load Plugin: " + path.filename().string(), TygerFramework::Error);
+                FrameworkInstance->LogMessage("[Plugin Loader] Failed to Load Plugin: " + path.stem().string(), TygerFramework::Error);
                 continue;
             }
 
@@ -43,5 +63,39 @@ catch (...) {
     FrameworkInstance->LogMessage("[Plugin Loader] Unhandled Exception Occured During Plugin Early Initilization", TygerFramework::Error);
 }
 
-    
+//Call TygerFrameworkPluginInitialize on any dlls that export it
+void PluginLoader::Initialize() {
+
+    //Set Tygerframework module
+    pluginInitParam.tygerFrameworkModule = FrameworkInstance->getFrameworkModule();
+
+    for (auto plugins = mPlugins.begin(); plugins != mPlugins.end();) {
+        std::string pluginName = plugins->first;
+        HMODULE pluginModule = plugins->second;
+        auto pluginInitializer = (TyFPluginInitializer)GetProcAddress(pluginModule, "TygerFrameworkPluginInitialize");
+
+        //Skip the plugin if it doesn't have the function
+        if (pluginInitializer == nullptr) {
+            ++plugins;
+            continue;
+        }
+
+        FrameworkInstance->LogMessage("[Plugin Loader] Initializing: " + pluginName);
+        try {
+            if (!pluginInitializer(&pluginInitParam)) {
+                FrameworkInstance->LogMessage("[Plugin Loader] Failed to Initialize: " + pluginName, TygerFramework::Error);
+                FreeLibrary(pluginModule);
+                plugins = mPlugins.erase(plugins);
+                continue;
+            }
+        }
+        catch (...) {
+            FrameworkInstance->LogMessage("[Plugin Loader] " + pluginName + "Had An Exception Occur In TygerFrameworkPluginInitialize, Skipping", TygerFramework::Error);
+            FreeLibrary(pluginModule);
+            plugins = mPlugins.erase(plugins);
+            continue;
+        }
+
+        ++plugins;
+    }
 }
