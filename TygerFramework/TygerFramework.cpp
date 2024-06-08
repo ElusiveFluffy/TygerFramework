@@ -10,10 +10,6 @@ std::filesystem::path TygerFramework::GetPluginDir() {
     return fs::current_path() / "Plugins";
 }
 
-int TygerFramework::WhichTyGame() {
-    return TyGame;
-}
-
 TygerFramework::TygerFramework(HMODULE tygerFrameworkModule)
     : mTygerFrameworkModule{tygerFrameworkModule}
 {
@@ -63,12 +59,13 @@ void TygerFramework::AttemptToDetectGameFromExe() {
     fs::path exePath(fullPath);
     std::string exeName = exePath.stem().string();
 
-    if (exeName == "TY")
-        TyGame = 1;
-    else if (exeName == "TY2")
-        TyGame = 2;
-    else if (exeName == "TY3")
+    //Start from Ty 3 otherwise if starting with just "Ty" it'll find that in Ty 2 and 3
+    if (exeName.find("TY3") != std::string::npos)
         TyGame = 3;
+    else if (exeName.find("TY2") != std::string::npos)
+        TyGame = 2;
+    else if (exeName.find("TY") != std::string::npos)
+        TyGame = 1;
 
     if (TyGame != 0) {
         LogMessage("Ty " + std::to_string(TyGame) + " Sucessfully Detected");
