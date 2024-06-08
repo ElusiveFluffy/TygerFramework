@@ -8,8 +8,8 @@ namespace tygerFramework {
     void LogPluginMessage(std::string message) {
         FrameworkInstance->LogMessage("[Plugin] " + message, TygerFramework::Info);
     }
-    void LogPluginProblem(std::string message, LogLevel logType) {
-        FrameworkInstance->LogMessage("[Plugin] " + message, (TygerFramework::LogLevel)logType);
+    void LogPluginProblem(std::string message, LogLevel logLevel) {
+        FrameworkInstance->LogMessage("[Plugin] " + message, (TygerFramework::LogLevel)logLevel);
     }
 
     int WhichTyGame() {

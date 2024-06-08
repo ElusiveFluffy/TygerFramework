@@ -10,7 +10,7 @@ enum LogLevel
 
 typedef struct {
 	void (*LogPluginMessage)(std::string message);
-	void (*LogPluginProblem)(std::string message, LogLevel logType);
+	void (*LogPluginProblem)(std::string message, LogLevel logLevel);
 	int (*WhichTyGame)();
 }TygerFrameworkPluginFunctions;
 

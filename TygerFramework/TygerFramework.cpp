@@ -75,26 +75,26 @@ void TygerFramework::AttemptToDetectGameFromExe() {
     }
 }
 
-void TygerFramework::LogMessage(std::string message, LogLevel logType) {
-    std::string logTypeString;
+void TygerFramework::LogMessage(std::string message, LogLevel logLevel) {
+    std::string logLevelString;
     
     if (mLogger.is_open())
     {
-        switch (logType)
+        switch (logLevel)
         {
         case TygerFramework::Info:
-            logTypeString = "[Info] ";
+            logLevelString = "[Info] ";
             break;
         case TygerFramework::Warning:
-            logTypeString = "[Warning] ";
+            logLevelString = "[Warning] ";
             break;
         case TygerFramework::Error:
-            logTypeString = "[Error] ";
+            logLevelString = "[Error] ";
             break;
         default:
             break;
         }
-        mLogger << logTypeString << message << std::endl;
+        mLogger << logLevelString << message << std::endl;
     }
     else {
         std::ofstream outfile("LoggerErrors.txt");
