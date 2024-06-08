@@ -18,6 +18,15 @@ namespace TygerFrameworkAPI {
 			return mInstance;
 		}
 
+		//Only call this AFTER calling initialize
+		static auto& Get() {
+			if (mInstance == nullptr) {
+				throw std::runtime_error("API not initialized");
+			}
+
+			return mInstance;
+		}
+
 		API(const TygerFrameworkPluginInitializeParam* param)
 			: mParam{ param }
 		{
@@ -25,6 +34,10 @@ namespace TygerFrameworkAPI {
 
 		inline const auto param() const {
 			return mParam;
+		}
+
+		void LogPluginMessage(std::string message, LogLevel logLevel = Info) const {
+			param()->functions->LogPluginMessage(message, logLevel);
 		}
 
 	private:

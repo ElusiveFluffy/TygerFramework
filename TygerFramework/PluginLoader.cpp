@@ -5,10 +5,7 @@
 #include <filesystem>
 
 namespace tygerFramework {
-    void LogPluginMessage(std::string message) {
-        FrameworkInstance->LogMessage("[Plugin] " + message, TygerFramework::Info);
-    }
-    void LogPluginProblem(std::string message, LogLevel logLevel) {
+    void LogPluginMessage(std::string message, LogLevel logLevel) {
         FrameworkInstance->LogMessage("[Plugin] " + message, (TygerFramework::LogLevel)logLevel);
     }
 
@@ -19,7 +16,6 @@ namespace tygerFramework {
 
 TygerFrameworkPluginFunctions pluginFunctions{
     tygerFramework::LogPluginMessage,
-    tygerFramework::LogPluginProblem,
     tygerFramework::WhichTyGame
 };
 
