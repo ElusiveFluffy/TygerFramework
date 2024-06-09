@@ -5,7 +5,8 @@
 namespace TygerFrameworkAPI {
 	class API {
 	public:
-		//Optional, name to be used in the logs
+		//Will default to the plugin's file name on initialization, the name will be used in the logs
+		//If you want a different name, can change the plugin name in DllMain
 		static inline std::string PluginName = "Plugin";
 
 		static auto& Initialize(const TygerFrameworkPluginInitializeParam* param) {
@@ -18,6 +19,11 @@ namespace TygerFrameworkAPI {
 			}
 
 			mInstance = std::make_unique<API>(param);
+
+			//If the plugin name has already been changed to something custom it won't change it to the file name
+			if (PluginName == "Plugin")
+				PluginName = param->pluginFileName;
+
 			return mInstance;
 		}
 

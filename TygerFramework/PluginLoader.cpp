@@ -21,6 +21,7 @@ TygerFrameworkPluginFunctions pluginFunctions{
 
 TygerFrameworkPluginInitializeParam pluginInitParam{
     nullptr,
+    "",
     &pluginFunctions
 };
 
@@ -80,6 +81,7 @@ void PluginLoader::Initialize() {
             continue;
         }
 
+        pluginInitParam.pluginFileName = pluginName;
         FrameworkInstance->LogMessage("[Plugin Loader] Initializing: " + pluginName);
         try {
             if (!pluginInitializer(&pluginInitParam)) {

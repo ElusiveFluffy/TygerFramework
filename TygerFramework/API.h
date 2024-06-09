@@ -15,6 +15,7 @@ typedef struct {
 
 typedef struct {
 	void* tygerFrameworkModule;
+	std::string pluginFileName;
 	const TygerFrameworkPluginFunctions* functions;
 }TygerFrameworkPluginInitializeParam;
 
