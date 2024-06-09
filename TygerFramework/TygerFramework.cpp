@@ -14,7 +14,7 @@ TygerFramework::TygerFramework(HMODULE tygerFrameworkModule)
     : mTygerFrameworkModule{tygerFrameworkModule}
 {
     mLogger.open("TygerFrameworkLog.txt");
-    LogMessage("Logger Started");
+    LogMessage("[TygerFramework] Logger Started");
 
     if (fs::exists("steam_appid.txt"))
     {
@@ -35,17 +35,17 @@ TygerFramework::TygerFramework(HMODULE tygerFrameworkModule)
             break;
         }
         if (TyGame != 0) {
-            LogMessage("Ty " + std::to_string(TyGame) + " Sucessfully Detected");
+            LogMessage("[TygerFramework] Ty " + std::to_string(TyGame) + " Sucessfully Detected");
         }
         else {
-            LogMessage("Invalid steam_appid found, may be unable to accurately detect which Ty game is running, checking exe name", TygerFramework::Warning);
+            LogMessage("[TygerFramework] Invalid steam_appid found, may be unable to accurately detect which Ty game is running, checking exe name", TygerFramework::Warning);
             AttemptToDetectGameFromExe();
         }
     }
     else
     {
         //If you're running it on steam it should always have this but just in case
-        LogMessage("steam_appid.txt not found, may be unable to accurately detect which Ty game is running, checking exe name", TygerFramework::Warning);
+        LogMessage("[TygerFramework] steam_appid.txt not found, may be unable to accurately detect which Ty game is running, checking exe name", TygerFramework::Warning);
         AttemptToDetectGameFromExe();
     }
 }
@@ -65,10 +65,10 @@ void TygerFramework::AttemptToDetectGameFromExe() {
         TyGame = 1;
 
     if (TyGame != 0) {
-        LogMessage("Ty " + std::to_string(TyGame) + " Sucessfully Detected");
+        LogMessage("[TygerFramework] Ty " + std::to_string(TyGame) + " Sucessfully Detected");
     }
     else {
-        LogMessage("Unable to detect which Ty game is running from the exe", TygerFramework::Warning);
+        LogMessage("[TygerFramework] Unable to detect which Ty game is running from the exe", TygerFramework::Warning);
     }
 }
 
