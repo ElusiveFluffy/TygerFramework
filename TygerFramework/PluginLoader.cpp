@@ -6,7 +6,7 @@
 
 namespace tygerFramework {
     void LogPluginMessage(std::string message, LogLevel logLevel) {
-        FrameworkInstance->LogMessage("[Plugin] " + message, (TygerFramework::LogLevel)logLevel);
+        FrameworkInstance->LogMessage(message, (TygerFramework::LogLevel)logLevel);
     }
 
     int WhichTyGame() {

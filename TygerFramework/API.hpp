@@ -5,6 +5,9 @@
 namespace TygerFrameworkAPI {
 	class API {
 	public:
+		//Optional, name to be used in the logs
+		static inline std::string PluginName = "Plugin";
+
 		static auto& Initialize(const TygerFrameworkPluginInitializeParam* param) {
 			if (param == nullptr) {
 				throw std::runtime_error("param is null");
@@ -37,7 +40,7 @@ namespace TygerFrameworkAPI {
 		}
 
 		void LogPluginMessage(std::string message, LogLevel logLevel = Info) const {
-			param()->functions->LogPluginMessage(message, logLevel);
+			param()->functions->LogPluginMessage("[" + PluginName + "] " + message, logLevel);
 		}
 
 	private:
