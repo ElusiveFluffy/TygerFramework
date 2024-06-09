@@ -48,9 +48,6 @@ TygerFramework::TygerFramework(HMODULE tygerFrameworkModule)
         LogMessage("steam_appid.txt not found, may be unable to accurately detect which Ty game is running, checking exe name", TygerFramework::Warning);
         AttemptToDetectGameFromExe();
     }
-
-    //Early intilization for the plugins before the game window shows, runs on the same startup thread as the game and the game will wait for this to complete
-    //mPluginLoader.EarlyInit();
 }
 
 void TygerFramework::AttemptToDetectGameFromExe() {
