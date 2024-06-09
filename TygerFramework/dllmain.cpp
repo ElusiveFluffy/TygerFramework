@@ -53,12 +53,16 @@ EXTERN_C DWORD WINAPI xinput_get_state(DWORD dwUserIndex, XINPUT_STATE* pState) 
     return ((decltype(XInputGetState)*)GetProcAddress(pXInput, "XInputGetState"))(dwUserIndex, pState);
 }
 
+void startupThread(HMODULE tygerFrameworkModule) {
+    FrameworkInstance->PluginLoader.Initialize();
+}
+
 BOOL APIENTRY DllMain(HANDLE handle, DWORD reason, LPVOID reserved) {
     if (reason == DLL_PROCESS_ATTACH) {
         FrameworkInstance = std::make_unique<TygerFramework>(GetModuleHandle(NULL));
         //Early intilization for the plugins before the game window shows, runs on the same startup thread as the game and the game will wait for this to complete
         FrameworkInstance->PluginLoader.EarlyInit();
-        FrameworkInstance->PluginLoader.Initialize();
+        CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)startupThread, handle, 0, nullptr);
     }
 
     return TRUE;
