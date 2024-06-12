@@ -17,6 +17,9 @@ extern "C" __declspec(dllexport) bool TygerFrameworkPluginInitialize(TygerFramew
     //Make sure to call this first before any API Functions
     API::Initialize(param);
 ```
+From this function you need to return a bool, `true` for if your plugin `successfully` initialized, and `false` if your plugin `failed` to initialize and there is no way to recover. Returning false will make TygerFramework `unload` your plugin
+
+One example you could also use false for is checking which game is running and if its not the game the plugin was made for you can return false and have the plugin unload.
 
 If you're using a C++ project file make sure to also add a `Source.def` file. To create one from the add new file menu go to the code section then Module-Definition File. To make sure it auto linked right click on `project` then `properties>linker>input` and the Source.def file should be in the module definition file section, if not just add it in there.
 
