@@ -15,7 +15,7 @@ TygerFramework::TygerFramework(HMODULE tygerFrameworkModule)
     : mTygerFrameworkModule{tygerFrameworkModule}
 {
     mLogger.open("TygerFrameworkLog.txt");
-    StartUpConsole();
+    CreateConsole();
     LogMessage("[TygerFramework] Logger Started");
 
     if (fs::exists("steam_appid.txt"))
@@ -52,10 +52,12 @@ TygerFramework::TygerFramework(HMODULE tygerFrameworkModule)
     }
 }
 
-void TygerFramework::StartUpConsole() {
+void TygerFramework::CreateConsole() {
     AllocConsole();
     FILE* fDummy;
     freopen_s(&fDummy, "CONOUT$", "w", stdout);
+    //Reset the stream in case there is errors blocking it for some reason
+    std::cout.clear();
 }
 
 void TygerFramework::AttemptToDetectGameFromExe() {

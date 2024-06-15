@@ -27,7 +27,7 @@ private:
 	static constexpr int Ty2AppID = 411970;
 	static constexpr int Ty3AppID = 411980;
 	void AttemptToDetectGameFromExe();
-	void StartUpConsole();
+	void CreateConsole();
 };
 
 extern std::unique_ptr<TygerFramework> FrameworkInstance;
