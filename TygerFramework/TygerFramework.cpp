@@ -2,6 +2,7 @@
 #include "TygerFramework.h"
 #include <filesystem>
 #include <fstream>
+#include <iostream>
 namespace fs = std::filesystem;
 
 std::unique_ptr<TygerFramework> FrameworkInstance;
@@ -14,6 +15,7 @@ TygerFramework::TygerFramework(HMODULE tygerFrameworkModule)
     : mTygerFrameworkModule{tygerFrameworkModule}
 {
     mLogger.open("TygerFrameworkLog.txt");
+    StartUpConsole();
     LogMessage("[TygerFramework] Logger Started");
 
     if (fs::exists("steam_appid.txt"))
@@ -48,6 +50,12 @@ TygerFramework::TygerFramework(HMODULE tygerFrameworkModule)
         LogMessage("[TygerFramework] steam_appid.txt not found, may be unable to accurately detect which Ty game is running, checking exe name", TygerFramework::Warning);
         AttemptToDetectGameFromExe();
     }
+}
+
+void TygerFramework::StartUpConsole() {
+    AllocConsole();
+    FILE* fDummy;
+    freopen_s(&fDummy, "CONOUT$", "w", stdout);
 }
 
 void TygerFramework::AttemptToDetectGameFromExe() {
@@ -92,6 +100,7 @@ void TygerFramework::LogMessage(std::string message, LogLevel logLevel) {
             break;
         }
         mLogger << logLevelString << message << std::endl;
+        std::cout << logLevelString << message << std::endl;
     }
     else {
         std::ofstream outfile("LoggerErrors.txt");
