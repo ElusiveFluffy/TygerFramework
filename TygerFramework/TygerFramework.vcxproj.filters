@@ -39,6 +39,9 @@
     <ClInclude Include="API.hpp">
       <Filter>API</Filter>
     </ClInclude>
+    <ClInclude Include="OpenGLHook.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -51,6 +54,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TygerFramework.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenGLHook.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

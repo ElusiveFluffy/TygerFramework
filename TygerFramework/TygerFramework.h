@@ -18,6 +18,7 @@ public:
 	int WhichTyGame() const { return TyGame; };
 	TygerFramework(HMODULE tygerFrameworkModule);
 	void LogMessage(std::string message, LogLevel errorType = Info);
+	void Shutdown();
 private:
 	HMODULE mTygerFrameworkModule;
 	std::ofstream mLogger;

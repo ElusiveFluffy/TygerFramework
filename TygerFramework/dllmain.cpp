@@ -58,11 +58,16 @@ void startupThread(HMODULE tygerFrameworkModule) {
 }
 
 BOOL APIENTRY DllMain(HANDLE handle, DWORD reason, LPVOID reserved) {
-    if (reason == DLL_PROCESS_ATTACH) {
+    switch (reason) {
+    case DLL_PROCESS_ATTACH:
         FrameworkInstance = std::make_unique<TygerFramework>(GetModuleHandle(NULL));
         //Early intilization for the plugins before the game window shows, runs on the same startup thread as the game and the game will wait for this to complete
         FrameworkInstance->PluginLoader.EarlyInit();
         CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)startupThread, handle, 0, nullptr);
+        break;
+    case DLL_PROCESS_DETACH:
+        FrameworkInstance->Shutdown();
+        break;
     }
 
     return TRUE;

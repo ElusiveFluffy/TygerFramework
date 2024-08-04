@@ -3,6 +3,8 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include "MinHook.h"
+#include "OpenGLHook.h"
 namespace fs = std::filesystem;
 
 std::unique_ptr<TygerFramework> FrameworkInstance;
@@ -50,6 +52,30 @@ TygerFramework::TygerFramework(HMODULE tygerFrameworkModule)
         LogMessage("[TygerFramework] steam_appid.txt not found, may be unable to accurately detect which Ty game is running, checking exe name", TygerFramework::Warning);
         AttemptToDetectGameFromExe();
     }
+
+    //Setup MinHook
+    MH_STATUS minhookStatus = MH_Initialize();
+    if (minhookStatus != MH_OK) {
+        std::string error = MH_StatusToString(minhookStatus);
+        LogMessage("[TygerFramework] Failed to Initialize Minhook, With the Error: " + error, Error);
+    }
+
+    //Hook OpenGL Swap Buffers Function
+    if (!OpenGLHook::Hook()) {
+        LogMessage("[OpenGL Hook] Failed to Hook the OpenGL Swap Buffers Function", Error);
+    }
+    else {
+        LogMessage("[OpenGL Hook] Sucessfully Hooked OpenGL Swap Buffers Function");
+    }
+}
+
+void TygerFramework::Shutdown() {
+    FreeConsole();
+
+    //Shutdown MinHook and remove all hooks
+    MH_Uninitialize();
+    MH_DisableHook(MH_ALL_HOOKS);
+    MH_RemoveHook(MH_ALL_HOOKS);
 }
 
 void TygerFramework::CreateConsole() {
