@@ -2,13 +2,19 @@
 #include "OpenGLHook.h"
 #include "MinHook.h"
 #include "TygerFramework.h"
+#include "GUI.h"
 
 typedef BOOL (__stdcall* wglSwapBuffers_t) (HDC hDC);
 wglSwapBuffers_t Original_wglSwapBuffers;
 wglSwapBuffers_t Target_wglSwapBuffers;
 
 BOOL __stdcall wglSwapBuffers_Func(HDC hDC) {
-	FrameworkInstance->LogMessage("Tick");
+	//FrameworkInstance->LogMessage("Tick");
+
+	if (!GUI::Initialized)
+		GUI::Init();
+	else
+		GUI::Draw();
 
 	//Run the original function
 	return Original_wglSwapBuffers(hDC);
