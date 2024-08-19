@@ -18,6 +18,7 @@ typedef BOOL (__stdcall* GetKeyboardState_t) (PBYTE lpKeyState);
 GetKeyboardState_t Original_GetKeyboardState;
 
 BOOL __stdcall SetCursorPosHook(int X, int Y) {
+	//Unlock the cursor from the center of the screen (for when the game locks it)
 	if (GUI::DrawGUI)
 		return 1;
 
@@ -25,9 +26,11 @@ BOOL __stdcall SetCursorPosHook(int X, int Y) {
 }
 
 BOOL __stdcall GetKeyboardStateHook(PBYTE lpKeyState) {
-	
+	//Disable left clicking if GUI is open
 	if (GUI::DrawGUI) {
+		//Get the current key state for everything else
 		Original_GetKeyboardState(lpKeyState);
+		//Disable the left mouse button
 		lpKeyState[VK_LBUTTON] = 0;
 		return 1;
 	}
@@ -36,12 +39,14 @@ BOOL __stdcall GetKeyboardStateHook(PBYTE lpKeyState) {
 }
 
 bool HookInput() {
+	//Hook SetCursorPos
 	MH_STATUS minHookStatus = MH_CreateHookApi(L"User32", "SetCursorPos", &SetCursorPosHook, reinterpret_cast<LPVOID*>(&Original_SetCursorPos));
 	if (minHookStatus != MH_OK) {
 		std::string error = MH_StatusToString(minHookStatus);
 		FrameworkInstance->LogMessage("[GUI] Failed to Create the SetCursorPos Hook, With the Error: " + error, TygerFramework::Error);
 		return false;
 	}
+	//Hook GetKeyboardState
 	minHookStatus = MH_CreateHookApi(L"User32", "GetKeyboardState", &GetKeyboardStateHook, reinterpret_cast<LPVOID*>(&Original_GetKeyboardState));
 	if (minHookStatus != MH_OK) {
 		std::string error = MH_StatusToString(minHookStatus);
@@ -49,6 +54,7 @@ bool HookInput() {
 		return false;
 	}
 
+	//Enable both hooks
 	minHookStatus = MH_EnableHook(MH_ALL_HOOKS);
 	if (minHookStatus != MH_OK) {
 		std::string error = MH_StatusToString(minHookStatus);
