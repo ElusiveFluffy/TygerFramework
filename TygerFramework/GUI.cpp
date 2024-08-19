@@ -2,6 +2,7 @@
 #include "GUI.h"
 #include "TygerFramework.h"
 #include "WinUser.h"
+#include "MinHook.h"
 
 #include "imgui.h"
 #include "imgui_impl_opengl3.h"
@@ -9,6 +10,55 @@
 
 static WNDPROC Original_Wndproc;
 LRESULT __stdcall WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+//SetCursorPos Hook
+typedef BOOL (__stdcall* SetCursorPos_t) (int X, int Y);
+SetCursorPos_t Original_SetCursorPos;
+//GetKeyboardState Hook
+typedef BOOL (__stdcall* GetKeyboardState_t) (PBYTE lpKeyState);
+GetKeyboardState_t Original_GetKeyboardState;
+
+BOOL __stdcall SetCursorPosHook(int X, int Y) {
+	if (GUI::DrawGUI)
+		return 1;
+
+	return Original_SetCursorPos(X, Y);
+}
+
+BOOL __stdcall GetKeyboardStateHook(PBYTE lpKeyState) {
+	
+	if (GUI::DrawGUI) {
+		Original_GetKeyboardState(lpKeyState);
+		lpKeyState[VK_LBUTTON] = 0;
+		return 1;
+	}
+
+	return Original_GetKeyboardState(lpKeyState);
+}
+
+bool HookInput() {
+	MH_STATUS minHookStatus = MH_CreateHookApi(L"User32", "SetCursorPos", &SetCursorPosHook, reinterpret_cast<LPVOID*>(&Original_SetCursorPos));
+	if (minHookStatus != MH_OK) {
+		std::string error = MH_StatusToString(minHookStatus);
+		FrameworkInstance->LogMessage("[GUI] Failed to Create the SetCursorPos Hook, With the Error: " + error, TygerFramework::Error);
+		return false;
+	}
+	minHookStatus = MH_CreateHookApi(L"User32", "GetKeyboardState", &GetKeyboardStateHook, reinterpret_cast<LPVOID*>(&Original_GetKeyboardState));
+	if (minHookStatus != MH_OK) {
+		std::string error = MH_StatusToString(minHookStatus);
+		FrameworkInstance->LogMessage("[GUI] Failed to Create the GetKeyboardState Hook, With the Error: " + error, TygerFramework::Error);
+		return false;
+	}
+
+	minHookStatus = MH_EnableHook(MH_ALL_HOOKS);
+	if (minHookStatus != MH_OK) {
+		std::string error = MH_StatusToString(minHookStatus);
+		FrameworkInstance->LogMessage("[GUI] Failed to Enable the Mouse Hooks, With the Error: " + error, TygerFramework::Error);
+		return false;
+	}
+
+	return true;
+}
+
 bool GUI::Init() {
 
 	LPCSTR tyWindowName = "";
@@ -33,6 +83,9 @@ bool GUI::Init() {
 	}
 	Original_Wndproc = (WNDPROC)SetWindowLongPtrW(TyWindowHandle, GWLP_WNDPROC, (LONG_PTR)WndProc);
 
+	//Hook all the stuff needed to disable mouse input
+	HookInput();
+
 	FrameworkInstance->LogMessage("[GUI] Successfully Got Ty Window Handle");
 
 	//Setup ImGui Context
@@ -43,14 +96,14 @@ bool GUI::Init() {
     ImGui_ImplOpenGL3_Init();
 
 	//Temp
-	ShowCursor(true);
+	ShowCursor(GUI::DrawGUI);
 
 	Initialized = true;
 	return true;
 }
 
 void GUI::Draw() {
-	if (!GUI::DrawUI)
+	if (!GUI::DrawGUI)
 		return;
 
 	ImGui_ImplOpenGL3_NewFrame();
@@ -62,7 +115,7 @@ void GUI::Draw() {
 	//ImGui::Text("Hello From TygerFramework");
 
 	//ImGui::End();
-	ImGui::ShowDemoWindow(&GUI::DrawUI);
+	ImGui::ShowDemoWindow(&GUI::DrawGUI);
 
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -75,11 +128,15 @@ LRESULT __stdcall WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		//Toggle ImGui
 		if (msg == WM_KEYDOWN && wParam == VK_F1) {
-			GUI::DrawUI = !GUI::DrawUI;
-			ShowCursor(GUI::DrawUI);
+			GUI::DrawGUI = !GUI::DrawGUI;
+			ShowCursor(GUI::DrawGUI);
 		}
 
-		if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
+		//Pass WndProc to imgui first
+		LRESULT imGuiLResult = ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
+
+		//Stop the game from registering mouse movement for the camera when the GUI is open
+		if (GUI::DrawGUI && msg == WM_INPUT || imGuiLResult)
 			return true;
 	}
 

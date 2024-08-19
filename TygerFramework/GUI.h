@@ -2,7 +2,7 @@
 namespace GUI
 {
 	inline bool Initialized;
-	inline bool DrawUI = true;
+	inline bool DrawGUI = true;
 	static HWND TyWindowHandle;
 
 	bool Init();
