@@ -9,12 +9,16 @@ wglSwapBuffers_t Original_wglSwapBuffers;
 wglSwapBuffers_t Target_wglSwapBuffers;
 
 BOOL WINAPI wglSwapBuffers_Func(HDC hDC) {
-	//FrameworkInstance->LogMessage("Tick");
 
+	//ImGui
 	if (!GUI::Initialized)
 		GUI::Init();
 	else
 		GUI::Draw();
+
+	//If the checkbox value is different than the visibility, toggle the console
+	if (IsWindowVisible(GetConsoleWindow()) != FrameworkInstance->ShowConsole)
+		FrameworkInstance->ToggleConsoleVisibility();
 
 	//Run the original function
 	return Original_wglSwapBuffers(hDC);
@@ -22,9 +26,8 @@ BOOL WINAPI wglSwapBuffers_Func(HDC hDC) {
 
 //Returns false if fail
 bool OpenGLHook::Hook() {
-	//FARPROC wglSwapBuffers_address = GetProcAddress(GetModuleHandleA("OPENGL32.dll"), "wglSwapBuffers");
 
-	MH_STATUS minHookStatus = MH_CreateHookApi(L"OPENGL32", "wglSwapBuffers", &wglSwapBuffers_Func, reinterpret_cast<LPVOID*>(&Original_wglSwapBuffers));
+	MH_STATUS minHookStatus = MH_CreateHookApi(L"OPENGL32.dll", "wglSwapBuffers", &wglSwapBuffers_Func, reinterpret_cast<LPVOID*>(&Original_wglSwapBuffers));
 	if (minHookStatus != MH_OK) {
 		std::string error = MH_StatusToString(minHookStatus);
 		FrameworkInstance->LogMessage("[OpenGL Hook] Failed to Create the OpenGL Hook, With the Error: " + error, TygerFramework::Error);
@@ -39,5 +42,4 @@ bool OpenGLHook::Hook() {
 	}
 
 	return true;
-	//MH_CreateHook(wglSwapBuffers_address, &wglSwapBuffers_Func, reinterpret_cast<LPVOID*>(&Original_wglSwapBuffers));
 }

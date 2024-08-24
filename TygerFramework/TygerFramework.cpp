@@ -13,6 +13,13 @@ std::filesystem::path TygerFramework::GetPluginDir() {
     return fs::current_path() / "Plugins";
 }
 
+void TygerFramework::ToggleConsoleVisibility() {
+    if (IsWindowVisible(GetConsoleWindow()))
+        ShowWindow(GetConsoleWindow(), SW_HIDE);
+    else
+        ShowWindow(GetConsoleWindow(), SW_SHOW);
+}
+
 TygerFramework::TygerFramework(HMODULE tygerFrameworkModule)
     : mTygerFrameworkModule{tygerFrameworkModule}
 {
@@ -84,6 +91,8 @@ void TygerFramework::CreateConsole() {
     freopen_s(&fDummy, "CONOUT$", "w", stdout);
     //Reset the stream in case there is errors blocking it for some reason
     std::cout.clear();
+    //Hide the console by default
+    ShowWindow(GetConsoleWindow(), SW_HIDE);
 }
 
 void TygerFramework::AttemptToDetectGameFromExe() {

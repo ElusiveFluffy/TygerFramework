@@ -44,14 +44,14 @@ BOOL WINAPI GetKeyboardStateHook(PBYTE lpKeyState) {
 
 bool HookInput() {
 	//Hook SetCursorPos
-	MH_STATUS minHookStatus = MH_CreateHookApi(L"User32", "SetCursorPos", &SetCursorPosHook, reinterpret_cast<LPVOID*>(&Original_SetCursorPos));
+	MH_STATUS minHookStatus = MH_CreateHookApi(L"User32.dll", "SetCursorPos", &SetCursorPosHook, reinterpret_cast<LPVOID*>(&Original_SetCursorPos));
 	if (minHookStatus != MH_OK) {
 		std::string error = MH_StatusToString(minHookStatus);
 		FrameworkInstance->LogMessage("[GUI] Failed to Create the SetCursorPos Hook, With the Error: " + error, TygerFramework::Error);
 		return false;
 	}
 	//Hook GetKeyboardState
-	minHookStatus = MH_CreateHookApi(L"User32", "GetKeyboardState", &GetKeyboardStateHook, reinterpret_cast<LPVOID*>(&Original_GetKeyboardState));
+	minHookStatus = MH_CreateHookApi(L"User32.dll", "GetKeyboardState", &GetKeyboardStateHook, reinterpret_cast<LPVOID*>(&Original_GetKeyboardState));
 	if (minHookStatus != MH_OK) {
 		std::string error = MH_StatusToString(minHookStatus);
 		FrameworkInstance->LogMessage("[GUI] Failed to Create the GetKeyboardState Hook, With the Error: " + error, TygerFramework::Error);
@@ -120,12 +120,11 @@ void GUI::Draw() {
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
 
-	//ImGui::Begin("TygerFramework");
-
-	//ImGui::Text("Hello From TygerFramework");
-
-	//ImGui::End();
-	ImGui::ShowDemoWindow(&GUI::DrawGUI);
+	ImGui::Begin("TygerFramework");
+	ImGui::Text("Default Menu Key: F1");
+	ImGui::Checkbox("Show Console", &FrameworkInstance->ShowConsole);
+	ImGui::End();
+	//ImGui::ShowDemoWindow(&GUI::DrawGUI);
 
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

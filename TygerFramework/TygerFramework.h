@@ -19,6 +19,12 @@ public:
 	TygerFramework(HMODULE tygerFrameworkModule);
 	void LogMessage(std::string message, LogLevel errorType = Info);
 	void Shutdown();
+
+	void ToggleConsoleVisibility();
+
+	//UI Settings
+	bool ShowConsole;
+
 private:
 	HMODULE mTygerFrameworkModule;
 	std::ofstream mLogger;
