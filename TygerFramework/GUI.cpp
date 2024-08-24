@@ -11,13 +11,13 @@
 static WNDPROC Original_Wndproc;
 LRESULT __stdcall WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 //SetCursorPos Hook
-typedef BOOL (__stdcall* SetCursorPos_t) (int X, int Y);
+typedef BOOL (WINAPI* SetCursorPos_t) (int X, int Y);
 SetCursorPos_t Original_SetCursorPos;
 //GetKeyboardState Hook
-typedef BOOL (__stdcall* GetKeyboardState_t) (PBYTE lpKeyState);
+typedef BOOL (WINAPI* GetKeyboardState_t) (PBYTE lpKeyState);
 GetKeyboardState_t Original_GetKeyboardState;
 
-BOOL __stdcall SetCursorPosHook(int X, int Y) {
+BOOL WINAPI SetCursorPosHook(int X, int Y) {
 	//Unlock the cursor from the center of the screen (for when the game locks it)
 	if (GUI::DrawGUI)
 		return 1;
@@ -25,14 +25,18 @@ BOOL __stdcall SetCursorPosHook(int X, int Y) {
 	return Original_SetCursorPos(X, Y);
 }
 
-BOOL __stdcall GetKeyboardStateHook(PBYTE lpKeyState) {
+BOOL WINAPI GetKeyboardStateHook(PBYTE lpKeyState) {
 	//Disable left clicking if GUI is open
 	if (GUI::DrawGUI) {
 		//Get the current key state for everything else
-		Original_GetKeyboardState(lpKeyState);
-		//Disable the left mouse button
-		lpKeyState[VK_LBUTTON] = 0;
-		return 1;
+		BOOL returnVal = Original_GetKeyboardState(lpKeyState);
+		if (returnVal != 0) {
+			//Disable the mouse buttons
+			lpKeyState[VK_LBUTTON] = 0;
+			lpKeyState[VK_MBUTTON] = 0;
+			lpKeyState[VK_RBUTTON] = 0;
+		}
+		return returnVal;
 	}
 
 	return Original_GetKeyboardState(lpKeyState);
