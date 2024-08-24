@@ -9,7 +9,7 @@
 #include "imgui_impl_win32.h"
 
 static WNDPROC Original_Wndproc;
-LRESULT __stdcall WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 //SetCursorPos Hook
 typedef BOOL (WINAPI* SetCursorPos_t) (int X, int Y);
 SetCursorPos_t Original_SetCursorPos;
@@ -132,7 +132,7 @@ void GUI::Draw() {
 }
 
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-LRESULT __stdcall WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	if (GUI::Initialized)
 	{
