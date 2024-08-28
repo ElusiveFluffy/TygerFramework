@@ -16,10 +16,13 @@
     <Filter Include="API">
       <UniqueIdentifier>{87eb4759-3c4c-403d-8972-4f9c6b9fbdaf}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ImGui">
+    <Filter Include="Include">
+      <UniqueIdentifier>{7f5c4a3c-ec47-40bf-8bed-89060d7d0fd5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Include\ImGui">
       <UniqueIdentifier>{e8f059cd-5ed2-4734-969a-0b52c3e1174b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="ImGui\backends">
+    <Filter Include="Include\ImGui\backends">
       <UniqueIdentifier>{a06a574f-8707-41bd-8384-d0a8df166f92}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -51,32 +54,32 @@
     <ClInclude Include="GUI.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ImGui\imconfig.h">
-      <Filter>ImGui</Filter>
+    <ClInclude Include="Include\ImGui\backends\imgui_impl_opengl3.h">
+      <Filter>Include\ImGui\backends</Filter>
     </ClInclude>
-    <ClInclude Include="ImGui\imgui.h">
-      <Filter>ImGui</Filter>
+    <ClInclude Include="Include\ImGui\backends\imgui_impl_opengl3_loader.h">
+      <Filter>Include\ImGui\backends</Filter>
     </ClInclude>
-    <ClInclude Include="ImGui\imgui_internal.h">
-      <Filter>ImGui</Filter>
+    <ClInclude Include="Include\ImGui\backends\imgui_impl_win32.h">
+      <Filter>Include\ImGui\backends</Filter>
     </ClInclude>
-    <ClInclude Include="ImGui\imstb_rectpack.h">
-      <Filter>ImGui</Filter>
+    <ClInclude Include="Include\ImGui\imconfig.h">
+      <Filter>Include\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="ImGui\imstb_textedit.h">
-      <Filter>ImGui</Filter>
+    <ClInclude Include="Include\ImGui\imgui.h">
+      <Filter>Include\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="ImGui\imstb_truetype.h">
-      <Filter>ImGui</Filter>
+    <ClInclude Include="Include\ImGui\imgui_internal.h">
+      <Filter>Include\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="ImGui\backends\imgui_impl_opengl3.h">
-      <Filter>ImGui\backends</Filter>
+    <ClInclude Include="Include\ImGui\imstb_rectpack.h">
+      <Filter>Include\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="ImGui\backends\imgui_impl_opengl3_loader.h">
-      <Filter>ImGui\backends</Filter>
+    <ClInclude Include="Include\ImGui\imstb_textedit.h">
+      <Filter>Include\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="ImGui\backends\imgui_impl_win32.h">
-      <Filter>ImGui\backends</Filter>
+    <ClInclude Include="Include\ImGui\imstb_truetype.h">
+      <Filter>Include\ImGui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -98,26 +101,26 @@
     <ClCompile Include="GUI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ImGui\imgui.cpp">
-      <Filter>ImGui</Filter>
+    <ClCompile Include="Include\ImGui\backends\imgui_impl_opengl3.cpp">
+      <Filter>Include\ImGui\backends</Filter>
     </ClCompile>
-    <ClCompile Include="ImGui\imgui_demo.cpp">
-      <Filter>ImGui</Filter>
+    <ClCompile Include="Include\ImGui\backends\imgui_impl_win32.cpp">
+      <Filter>Include\ImGui\backends</Filter>
     </ClCompile>
-    <ClCompile Include="ImGui\imgui_draw.cpp">
-      <Filter>ImGui</Filter>
+    <ClCompile Include="Include\ImGui\imgui.cpp">
+      <Filter>Include\ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="ImGui\imgui_tables.cpp">
-      <Filter>ImGui</Filter>
+    <ClCompile Include="Include\ImGui\imgui_demo.cpp">
+      <Filter>Include\ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="ImGui\imgui_widgets.cpp">
-      <Filter>ImGui</Filter>
+    <ClCompile Include="Include\ImGui\imgui_draw.cpp">
+      <Filter>Include\ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="ImGui\backends\imgui_impl_opengl3.cpp">
-      <Filter>ImGui\backends</Filter>
+    <ClCompile Include="Include\ImGui\imgui_tables.cpp">
+      <Filter>Include\ImGui</Filter>
     </ClCompile>
-    <ClCompile Include="ImGui\backends\imgui_impl_win32.cpp">
-      <Filter>ImGui\backends</Filter>
+    <ClCompile Include="Include\ImGui\imgui_widgets.cpp">
+      <Filter>Include\ImGui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

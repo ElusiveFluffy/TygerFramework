@@ -72,7 +72,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <TargetName>XInput9_1_0</TargetName>
-    <IncludePath>ImGui/backends;ImGui;$(IncludePath)</IncludePath>
+    <IncludePath>Include/ImGui/backends;Include;Include/ImGui;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <VcpkgInstalledDir>
@@ -164,15 +164,15 @@
     <ClInclude Include="dllmain.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="GUI.h" />
-    <ClInclude Include="ImGui\backends\imgui_impl_opengl3.h" />
-    <ClInclude Include="ImGui\backends\imgui_impl_opengl3_loader.h" />
-    <ClInclude Include="ImGui\backends\imgui_impl_win32.h" />
-    <ClInclude Include="ImGui\imconfig.h" />
-    <ClInclude Include="ImGui\imgui.h" />
-    <ClInclude Include="ImGui\imgui_internal.h" />
-    <ClInclude Include="ImGui\imstb_rectpack.h" />
-    <ClInclude Include="ImGui\imstb_textedit.h" />
-    <ClInclude Include="ImGui\imstb_truetype.h" />
+    <ClInclude Include="Include\ImGui\backends\imgui_impl_opengl3.h" />
+    <ClInclude Include="Include\ImGui\backends\imgui_impl_opengl3_loader.h" />
+    <ClInclude Include="Include\ImGui\backends\imgui_impl_win32.h" />
+    <ClInclude Include="Include\ImGui\imconfig.h" />
+    <ClInclude Include="Include\ImGui\imgui.h" />
+    <ClInclude Include="Include\ImGui\imgui_internal.h" />
+    <ClInclude Include="Include\ImGui\imstb_rectpack.h" />
+    <ClInclude Include="Include\ImGui\imstb_textedit.h" />
+    <ClInclude Include="Include\ImGui\imstb_truetype.h" />
     <ClInclude Include="OpenGLHook.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="PluginLoader.h" />
@@ -181,13 +181,13 @@
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="GUI.cpp" />
-    <ClCompile Include="ImGui\backends\imgui_impl_opengl3.cpp" />
-    <ClCompile Include="ImGui\backends\imgui_impl_win32.cpp" />
-    <ClCompile Include="ImGui\imgui.cpp" />
-    <ClCompile Include="ImGui\imgui_demo.cpp" />
-    <ClCompile Include="ImGui\imgui_draw.cpp" />
-    <ClCompile Include="ImGui\imgui_tables.cpp" />
-    <ClCompile Include="ImGui\imgui_widgets.cpp" />
+    <ClCompile Include="Include\ImGui\backends\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="Include\ImGui\backends\imgui_impl_win32.cpp" />
+    <ClCompile Include="Include\ImGui\imgui.cpp" />
+    <ClCompile Include="Include\ImGui\imgui_demo.cpp" />
+    <ClCompile Include="Include\ImGui\imgui_draw.cpp" />
+    <ClCompile Include="Include\ImGui\imgui_tables.cpp" />
+    <ClCompile Include="Include\ImGui\imgui_widgets.cpp" />
     <ClCompile Include="OpenGLHook.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
