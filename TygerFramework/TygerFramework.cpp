@@ -49,7 +49,7 @@ TygerFramework::TygerFramework(HMODULE tygerFrameworkModule)
             break;
         }
         if (TyGame != 0) {
-            LogMessage("[TygerFramework] Ty " + std::to_string(TyGame) + " Sucessfully Detected");
+            LogMessage("[TygerFramework] Ty " + std::to_string(TyGame) + " Detected");
         }
         else {
             LogMessage("[TygerFramework] Invalid steam_appid found, may be unable to accurately detect which Ty game is running, checking exe name", TygerFramework::Warning);

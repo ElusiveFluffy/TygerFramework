@@ -66,6 +66,7 @@ bool HookInput() {
 		return false;
 	}
 
+	FrameworkInstance->LogMessage("[GUI] Hooked Mouse Input");
 	return true;
 }
 
@@ -92,11 +93,10 @@ bool GUI::Init() {
 		return false;
 	}
 	Original_Wndproc = (WNDPROC)SetWindowLongPtrW(TyWindowHandle, GWLP_WNDPROC, (LONG_PTR)WndProc);
+	FrameworkInstance->LogMessage("[GUI] Successfully Got Ty Window Handle");
 
 	//Hook all the stuff needed to disable mouse input
 	HookInput();
-
-	FrameworkInstance->LogMessage("[GUI] Successfully Got Ty Window Handle");
 
 	//Setup ImGui Context
 	ImGui::CreateContext();
