@@ -101,7 +101,7 @@ void TygerFramework::SaveSettings() {
     //Create GUI section
     settings.add_section("GUI");
     settings["GUI"].set<bool>("RememberVisibility", RememberVisibility);
-    settings["GUI"].set<bool>("GuiShown", GUI::DrawGUI);
+    settings["GUI"].set<bool>("GuiVisible", GUI::DrawGUI);
 
     //Save the settings
     settings.write("TygerFramework.ini");
@@ -138,8 +138,8 @@ void TygerFramework::LoadSettings() {
         if (GuiSection.has_key("RememberVisibility"))
             RememberVisibility = GuiSection.get<bool>("RememberVisibility");
         //Only set this if remembering visiblility
-        if (RememberVisibility && GuiSection.has_key("GuiShown"))
-            GUI::DrawGUI = GuiSection.get<bool>("GuiShown");
+        if (RememberVisibility && GuiSection.has_key("GuiVisible"))
+            GUI::DrawGUI = GuiSection.get<bool>("GuiVisible");
     }
 
     LogMessage("[TygerFramework] Loaded Settings from ini");
