@@ -24,6 +24,7 @@ public:
 
 	//UI Settings
 	bool ShowConsole;
+	bool RememberVisibility = true;
 
 private:
 	HMODULE mTygerFrameworkModule;
@@ -35,6 +36,8 @@ private:
 	static constexpr int Ty3AppID = 411980;
 	void AttemptToDetectGameFromExe();
 	void CreateConsole();
+	void SaveSettings();
+	void LoadSettings();
 };
 
 extern std::unique_ptr<TygerFramework> FrameworkInstance;

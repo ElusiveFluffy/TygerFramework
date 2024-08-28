@@ -81,6 +81,9 @@
     <ClInclude Include="Include\ImGui\imstb_truetype.h">
       <Filter>Include\ImGui</Filter>
     </ClInclude>
+    <ClInclude Include="Include\ini.h">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

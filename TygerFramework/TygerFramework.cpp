@@ -5,6 +5,8 @@
 #include <iostream>
 #include "MinHook.h"
 #include "OpenGLHook.h"
+#include "GUI.h"
+#include "ini.h"
 namespace fs = std::filesystem;
 
 std::unique_ptr<TygerFramework> FrameworkInstance;
@@ -26,6 +28,7 @@ TygerFramework::TygerFramework(HMODULE tygerFrameworkModule)
     mLogger.open("TygerFrameworkLog.txt");
     CreateConsole();
     LogMessage("[TygerFramework] Logger Started");
+    LoadSettings();
 
     if (fs::exists("steam_appid.txt"))
     {
@@ -77,6 +80,8 @@ TygerFramework::TygerFramework(HMODULE tygerFrameworkModule)
 }
 
 void TygerFramework::Shutdown() {
+    SaveSettings();
+
     FreeConsole();
 
     //Shutdown MinHook and remove all hooks
@@ -85,14 +90,69 @@ void TygerFramework::Shutdown() {
     MH_RemoveHook(MH_ALL_HOOKS);
 }
 
+void TygerFramework::SaveSettings() {
+    ini::File settings;
+
+    //Create TygerFramework section
+    settings.add_section("TygerFramework");
+    //Save the data, [Section name], (Value name, value)
+    settings["TygerFramework"].set<bool>("ShowConsole", ShowConsole);
+
+    //Create GUI section
+    settings.add_section("GUI");
+    settings["GUI"].set<bool>("RememberVisibility", RememberVisibility);
+    settings["GUI"].set<bool>("GuiShown", GUI::DrawGUI);
+
+    //Save the settings
+    settings.write("TygerFramework.ini");
+
+    LogMessage("[TygerFramework] Saved Settings to ini");
+}
+
+void TygerFramework::LoadSettings() {
+    if (!fs::exists("TygerFramework.ini")) {
+        //Console is hidden by default, hide it here instead of CreateConsole(), 
+        //to not have a slight flash when quickly reshowing it after loading settings
+        ShowWindow(GetConsoleWindow(), SW_HIDE);
+        return;
+    }
+
+    ini::File settings = ini::open("TygerFramework.ini");
+
+    //Tygerframework section
+    if (settings.has_section("TygerFramework")) {
+        ini::Section tygerFrameworkSection = settings["TygerFramework"];
+
+        if (tygerFrameworkSection.has_key("ShowConsole")) {
+            ShowConsole = tygerFrameworkSection.get<bool>("ShowConsole");
+            //Hide the console here instead of flashng it by reshowing it. It needs to be created before
+            //loading the settings to be able to log the message below to the console
+            if (!ShowConsole)
+                ShowWindow(GetConsoleWindow(), SW_HIDE);
+        }
+    }
+    //GUI section
+    if (settings.has_section("GUI")) {
+        ini::Section GuiSection = settings["GUI"];
+
+        if (GuiSection.has_key("RememberVisibility"))
+            RememberVisibility = GuiSection.get<bool>("RememberVisibility");
+        //Only set this if remembering visiblility
+        if (RememberVisibility && GuiSection.has_key("GuiShown"))
+            GUI::DrawGUI = GuiSection.get<bool>("GuiShown");
+    }
+
+    LogMessage("[TygerFramework] Loaded Settings from ini");
+
+    settings.clear();
+}
+
 void TygerFramework::CreateConsole() {
     AllocConsole();
     FILE* fDummy;
     freopen_s(&fDummy, "CONOUT$", "w", stdout);
     //Reset the stream in case there is errors blocking it for some reason
     std::cout.clear();
-    //Hide the console by default
-    ShowWindow(GetConsoleWindow(), SW_HIDE);
 }
 
 void TygerFramework::AttemptToDetectGameFromExe() {

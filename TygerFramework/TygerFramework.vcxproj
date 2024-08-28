@@ -173,6 +173,7 @@
     <ClInclude Include="Include\ImGui\imstb_rectpack.h" />
     <ClInclude Include="Include\ImGui\imstb_textedit.h" />
     <ClInclude Include="Include\ImGui\imstb_truetype.h" />
+    <ClInclude Include="Include\ini.h" />
     <ClInclude Include="OpenGLHook.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="PluginLoader.h" />

@@ -105,8 +105,9 @@ bool GUI::Init() {
 	ImGui_ImplWin32_InitForOpenGL(TyWindowHandle);
     ImGui_ImplOpenGL3_Init();
 
-	//Temp
-	ShowCursor(GUI::DrawGUI);
+	//Don't set it to false here or it breaks and never shows the cursor
+	if (GUI::DrawGUI)
+		ShowCursor(true);
 
 	Initialized = true;
 	return true;
@@ -123,6 +124,7 @@ void GUI::Draw() {
 	ImGui::Begin("TygerFramework");
 	ImGui::Text("Default Menu Key: F1");
 	ImGui::Checkbox("Show Console", &FrameworkInstance->ShowConsole);
+	ImGui::Checkbox("Remember Menu Visibility", &FrameworkInstance->RememberVisibility);
 	ImGui::End();
 	//ImGui::ShowDemoWindow(&GUI::DrawGUI);
 
