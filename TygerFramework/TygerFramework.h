@@ -25,6 +25,7 @@ public:
 	//UI Settings
 	bool ShowConsole;
 	bool RememberVisibility = true;
+	bool InputPassthrough = true;
 
 private:
 	HMODULE mTygerFrameworkModule;

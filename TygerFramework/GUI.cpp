@@ -3,6 +3,7 @@
 #include "TygerFramework.h"
 #include "WinUser.h"
 #include "MinHook.h"
+#include "PluginLoader.h"
 
 #include "imgui.h"
 #include "imgui_impl_opengl3.h"
@@ -26,8 +27,8 @@ BOOL WINAPI SetCursorPosHook(int X, int Y) {
 }
 
 BOOL WINAPI GetKeyboardStateHook(PBYTE lpKeyState) {
-	//Disable left clicking if GUI is open
-	if (GUI::DrawGUI) {
+	//Disable left clicking if GUI is open, and focused or not allowing input passthrough
+	if (GUI::DrawGUI && (GUI::ImGuiWindowFocused || !FrameworkInstance->InputPassthrough)) {
 		//Get the current key state for everything else
 		BOOL returnVal = Original_GetKeyboardState(lpKeyState);
 		if (returnVal != 0) {
@@ -117,17 +118,26 @@ void GUI::Draw() {
 	if (!GUI::DrawGUI)
 		return;
 
+	//Check if any imgui windows are focused for the mouse click hook
+	GUI::ImGuiWindowFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow);
+
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
 
 	//Set the window size once, just to update it to make sure its not too small
 	//when using the saved size and cutting off options when there is more options added
-	ImGui::SetNextWindowSize(ImVec2(285, 100), ImGuiCond_::ImGuiCond_Once);
+	ImGui::SetNextWindowSize(ImVec2(285, 120), ImGuiCond_::ImGuiCond_Once);
 	ImGui::Begin("TygerFramework");
 	ImGui::Text("Menu Key: F1");
 	ImGui::Checkbox("Show Console", &FrameworkInstance->ShowConsole);
 	ImGui::Checkbox("Remember Menu Visibility", &FrameworkInstance->RememberVisibility);
+	ImGui::Checkbox("Allow Input Passthrough", &FrameworkInstance->InputPassthrough);
+	ImGui::SameLine();
+	ImGui::Text("(?)");
+	if (ImGui::IsItemHovered())
+		ImGui::SetTooltip("Allows the game to register mouse clicks while the menu is open.");
+
 	ImGui::End();
 	//ImGui::ShowDemoWindow(&GUI::DrawGUI);
 
@@ -150,10 +160,10 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		if (GUI::DrawGUI)
 		{
 			//Pass WndProc to imgui (pass it in first due to potential "minimal evaluation" of the or in the if)
-		//Stop the game from registering mouse movement for the camera when the GUI is open
+			//Stop the game from registering mouse movement for the camera when the GUI is open
 			if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam) || msg == WM_INPUT)
-			return true;
-	}
+				return true;
+		}
 	}
 
 	//Skip ImGui's win proc if not initialized or isn't a ImGui one
