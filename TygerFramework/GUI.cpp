@@ -3,7 +3,6 @@
 #include "TygerFramework.h"
 #include "WinUser.h"
 #include "MinHook.h"
-#include "PluginLoader.h"
 
 #include "imgui.h"
 #include "imgui_impl_opengl3.h"
@@ -127,7 +126,7 @@ void GUI::Draw() {
 
 	//Set the window size once, just to update it to make sure its not too small
 	//when using the saved size and cutting off options when there is more options added
-	ImGui::SetNextWindowSize(ImVec2(285, 120), ImGuiCond_::ImGuiCond_Once);
+	ImGui::SetNextWindowSize(ImVec2(285, 175), ImGuiCond_::ImGuiCond_Once);
 	ImGui::Begin("TygerFramework");
 	ImGui::Text("Menu Key: F1");
 	ImGui::Checkbox("Show Console", &FrameworkInstance->ShowConsole);
@@ -137,6 +136,8 @@ void GUI::Draw() {
 	ImGui::Text("(?)");
 	if (ImGui::IsItemHovered())
 		ImGui::SetTooltip("Allows the game to register mouse clicks while the menu is open.");
+	
+	FrameworkInstance->PluginLoader.DrawUI();
 
 	ImGui::End();
 	//ImGui::ShowDemoWindow(&GUI::DrawGUI);

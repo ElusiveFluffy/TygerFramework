@@ -3,6 +3,7 @@
 #include "TygerFramework.h"
 #include <fstream>
 #include <filesystem>
+#include "imgui.h"
 
 namespace tygerFramework {
     void LogPluginMessage(std::string message, LogLevel logLevel) {
@@ -99,5 +100,22 @@ void PluginLoader::Initialize() {
         }
 
         ++plugins;
+    }
+}
+
+void PluginLoader::DrawUI() {
+    if (ImGui::CollapsingHeader("Plugins")) {
+
+        if (mPlugins.empty()) {
+            ImGui::Text("No Plugins Loaded");
+            return;
+        }
+        ImGui::Text("Loaded Plugins:");
+        ImGui::TreePush("Plugins");
+        for (auto&& [name, _] : mPlugins) {
+            ImGui::Text(name.c_str());
+        }
+
+        ImGui::TreePop();
     }
 }
