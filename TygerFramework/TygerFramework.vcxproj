@@ -162,6 +162,7 @@
     <ClInclude Include="API.h" />
     <ClInclude Include="API.hpp" />
     <ClInclude Include="dllmain.h" />
+    <ClInclude Include="Fonts\RobotoMedium.hpp" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="GUI.h" />
     <ClInclude Include="Include\ImGui\backends\imgui_impl_opengl3.h" />

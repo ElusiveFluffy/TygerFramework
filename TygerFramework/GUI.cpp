@@ -4,6 +4,7 @@
 #include "WinUser.h"
 #include "MinHook.h"
 
+#include "Fonts/RobotoMedium.hpp"
 #include "imgui.h"
 #include "imgui_impl_opengl3.h"
 #include "imgui_impl_win32.h"
@@ -100,6 +101,9 @@ bool GUI::Init() {
 
 	//Setup ImGui Context
 	ImGui::CreateContext();
+
+	SetImGuiStyle();
+
 	ImGuiIO& io = ImGui::GetIO();
 	(void)io;
 	ImGui_ImplWin32_InitForOpenGL(TyWindowHandle);
@@ -111,6 +115,17 @@ bool GUI::Init() {
 
 	Initialized = true;
 	return true;
+}
+
+void GUI::SetImGuiStyle() {
+	ImFontAtlas* fonts = ImGui::GetIO().Fonts;
+	fonts->Clear();
+
+	ImFontConfig custom_icons{};
+	custom_icons.FontDataOwnedByAtlas = false;
+
+	fonts->AddFontFromMemoryCompressedTTF(RobotoMedium_compressed_data, RobotoMedium_compressed_size, GUI::FontSize);
+	fonts->Build();
 }
 
 void GUI::Draw() {
@@ -126,7 +141,7 @@ void GUI::Draw() {
 
 	//Set the window size once, just to update it to make sure its not too small
 	//when using the saved size and cutting off options when there is more options added
-	ImGui::SetNextWindowSize(ImVec2(285, 175), ImGuiCond_::ImGuiCond_Once);
+	ImGui::SetNextWindowSize(ImVec2(285, 200), ImGuiCond_::ImGuiCond_Once);
 	ImGui::Begin("TygerFramework");
 	ImGui::Text("Menu Key: F1");
 	ImGui::Checkbox("Show Console", &FrameworkInstance->ShowConsole);
