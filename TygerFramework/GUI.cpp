@@ -121,8 +121,11 @@ void GUI::Draw() {
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
 
+	//Set the window size once, just to update it to make sure its not too small
+	//when using the saved size and cutting off options when there is more options added
+	ImGui::SetNextWindowSize(ImVec2(285, 100), ImGuiCond_::ImGuiCond_Once);
 	ImGui::Begin("TygerFramework");
-	ImGui::Text("Default Menu Key: F1");
+	ImGui::Text("Menu Key: F1");
 	ImGui::Checkbox("Show Console", &FrameworkInstance->ShowConsole);
 	ImGui::Checkbox("Remember Menu Visibility", &FrameworkInstance->RememberVisibility);
 	ImGui::End();
