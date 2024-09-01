@@ -146,12 +146,14 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			ShowCursor(GUI::DrawGUI);
 		}
 
-		//Pass WndProc to imgui first
-		LRESULT imGuiLResult = ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
-
+		//Only run when the GUI is shown (so it doesn't unfocus the imgui window when its hidden)
+		if (GUI::DrawGUI)
+		{
+			//Pass WndProc to imgui (pass it in first due to potential "minimal evaluation" of the or in the if)
 		//Stop the game from registering mouse movement for the camera when the GUI is open
-		if (GUI::DrawGUI && msg == WM_INPUT || imGuiLResult)
+			if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam) || msg == WM_INPUT)
 			return true;
+	}
 	}
 
 	//Skip ImGui's win proc if not initialized or isn't a ImGui one
