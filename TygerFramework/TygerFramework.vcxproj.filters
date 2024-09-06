@@ -84,6 +84,12 @@
     <ClInclude Include="Include\ini.h">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="Fonts\RobotoMedium.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="APIHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -124,6 +130,9 @@
     </ClCompile>
     <ClCompile Include="Include\ImGui\imgui_widgets.cpp">
       <Filter>Include\ImGui</Filter>
+    </ClCompile>
+    <ClCompile Include="APIHandler.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

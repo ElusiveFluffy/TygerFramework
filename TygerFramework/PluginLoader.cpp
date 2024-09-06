@@ -4,6 +4,7 @@
 #include <fstream>
 #include <filesystem>
 #include "imgui.h"
+#include "APIHandler.h"
 
 namespace tygerFramework {
     void LogPluginMessage(std::string message, LogLevel logLevel) {
@@ -17,7 +18,10 @@ namespace tygerFramework {
 
 TygerFrameworkPluginFunctions pluginFunctions{
     tygerFramework::LogPluginMessage,
-    tygerFramework::WhichTyGame
+    tygerFramework::WhichTyGame,
+    TygerFrameworkDrawPluginUi,
+    TygerFrameworkPluginWndProc,
+    TygerFrameworkGetImGuiContext
 };
 
 TygerFrameworkPluginInitializeParam pluginInitParam{
@@ -103,6 +107,7 @@ void PluginLoader::Initialize() {
     }
 }
 
+//Draw the loaded plugins section
 void PluginLoader::DrawUI() {
     if (ImGui::CollapsingHeader("Plugins")) {
 
@@ -118,4 +123,27 @@ void PluginLoader::DrawUI() {
 
         ImGui::TreePop();
     }
+}
+
+//ImGui context to send to plugins
+void* TygerFrameworkGetImGuiContext() {
+    return ImGui::GetCurrentContext();
+}
+
+//Plugin draw function subscriber
+bool TygerFrameworkDrawPluginUi(DrawUIFunc func)
+{
+    if (func == nullptr)
+        return false;
+
+    return APIHandler::Get()->AddDrawPluginUIFunc(func);
+}
+
+//Plugin WndProc function subscriber
+bool TygerFrameworkPluginWndProc(WndProcFunc func) {
+
+    if (func == nullptr)
+        return false;
+
+    return APIHandler::Get()->AddPluginWndProcFunc(func);
 }

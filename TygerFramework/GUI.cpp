@@ -1,8 +1,8 @@
 #include "pch.h"
 #include "GUI.h"
 #include "TygerFramework.h"
-#include "WinUser.h"
 #include "MinHook.h"
+#include "APIHandler.h"
 
 #include "Fonts/RobotoMedium.hpp"
 #include "imgui.h"
@@ -155,7 +155,9 @@ void GUI::Draw() {
 	FrameworkInstance->PluginLoader.DrawUI();
 
 	ImGui::End();
-	//ImGui::ShowDemoWindow(&GUI::DrawGUI);
+
+	//Draw all the plugin windows
+	APIHandler::Get()->DrawPluginUI();
 
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -175,9 +177,12 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		//Only run when the GUI is shown (so it doesn't unfocus the imgui window when its hidden)
 		if (GUI::DrawGUI)
 		{
-			//Pass WndProc to imgui (pass it in first due to potential "minimal evaluation" of the or in the if)
+			//Run the WndProcs both here so they will get run, so 1 doesn't not get run because of "minimal evaluation" of the or in the if
+			LRESULT WndProcResult = ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
+			//Plugin WndProc for if the plugin wants to block any WndProc from the game
+			bool pluginWndProcResult = APIHandler::Get()->PluginWndProc(hWnd, msg, wParam, lParam);
 			//Stop the game from registering mouse movement for the camera when the GUI is open
-			if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam) || msg == WM_INPUT)
+			if (WndProcResult || pluginWndProcResult || msg == WM_INPUT)
 				return true;
 		}
 	}
