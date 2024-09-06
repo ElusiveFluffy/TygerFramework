@@ -45,8 +45,26 @@ namespace TygerFrameworkAPI {
 			return mParam;
 		}
 
-		void LogPluginMessage(std::string message, LogLevel logLevel = Info) const {
-			param()->functions->LogPluginMessage("[" + PluginName + "] " + message, logLevel);
+		/// <summary>
+		/// Gets the current Ty Game
+		/// </summary>
+		/// <returns>0: Couldn't detect which game
+		/// <para>1: Ty 1</para>
+		/// <para>2: Ty 2</para>
+		/// <para>3: Ty 3</para></returns>
+		static int WhichTyGame() {
+			return Get()->param()->functions->WhichTyGame();
+		}
+
+		//Writes a message to the console and the log file. Default log level is info
+		static void LogPluginMessage(std::string message, LogLevel logLevel = Info) {
+			Get()->param()->functions->LogPluginMessage("[" + PluginName + "] " + message, logLevel);
+		}
+
+		//Returns the current ImGui Context 
+		//(Make sure to cast it to ImGuiContext* when setting it. Its a void* so it doesn't cause a error if you don't have ImGui)
+		static void* GetImGuiContext() {
+			return API::Get()->param()->functions->GetImGuiContext();
 		}
 
 	private:
