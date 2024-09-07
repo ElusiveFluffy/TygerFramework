@@ -7,6 +7,7 @@ bool TygerFrameworkDrawPluginUi(DrawUIFunc func);
 bool TygerFrameworkPluginImguiHasFocus(ImGuiHasFocusFunc func);
 bool TygerFrameworkPluginWndProc(WndProcFunc func);
 HWND TygerFrameworkGetTyWindowHandle();
+void TygerFrameworkSetImGuiFont(void* fonts);
 
 class PluginLoader
 {

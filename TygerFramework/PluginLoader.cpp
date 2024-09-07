@@ -5,6 +5,8 @@
 #include <filesystem>
 #include "imgui.h"
 #include "APIHandler.h"
+#include "Fonts/RobotoMedium.hpp"
+#include "GUI.h"
 
 namespace tygerFramework {
     void LogPluginMessage(std::string message, LogLevel logLevel) {
@@ -22,7 +24,8 @@ TygerFrameworkPluginFunctions pluginFunctions{
     TygerFrameworkDrawPluginUi,
     TygerFrameworkPluginImguiHasFocus,
     TygerFrameworkPluginWndProc,
-    TygerFrameworkGetTyWindowHandle
+    TygerFrameworkGetTyWindowHandle,
+    TygerFrameworkSetImGuiFont
 };
 
 TygerFrameworkPluginInitializeParam pluginInitParam{
@@ -129,6 +132,19 @@ void PluginLoader::DrawUI() {
 //ImGui context to send to plugins
 HWND TygerFrameworkGetTyWindowHandle() {
     return FrameworkInstance->TyWindowHandle;
+}
+
+//Sets the plugin's ImGui's font to match the one the loader uses
+void TygerFrameworkSetImGuiFont(void* imguiFont)
+{
+    ImFontAtlas* fonts = (ImFontAtlas*)imguiFont;
+    fonts->Clear();
+
+    ImFontConfig custom_icons{};
+    custom_icons.FontDataOwnedByAtlas = false;
+
+    fonts->AddFontFromMemoryCompressedTTF(RobotoMedium_compressed_data, RobotoMedium_compressed_size, GUI::FontSize);
+    fonts->Build();
 }
 
 bool TygerFrameworkPluginImguiHasFocus(ImGuiHasFocusFunc func)

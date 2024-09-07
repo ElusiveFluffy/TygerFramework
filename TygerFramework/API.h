@@ -23,6 +23,7 @@ typedef struct {
 	TyFPluginImGuiHasFocus PluginImGuiHasFocus;
 	TyFPluginWndProc PluginWndProc;
 	HWND(*GetTyWindowHandle)();
+	void (*SetImGuiFont)(void* imguiFont);
 }TygerFrameworkPluginFunctions;
 
 typedef struct {

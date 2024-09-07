@@ -66,6 +66,11 @@ namespace TygerFrameworkAPI {
 			Get()->param()->functions->LogPluginMessage("[" + PluginName + "] " + message, logLevel);
 		}
 
+		//Sets the imgui font to be the same as TygerFramework's main window
+		static void SetImGuiFont(void* imguiFont) {
+			Get()->param()->functions->SetImGuiFont(imguiFont);
+		}
+
 	private:
 		static inline std::unique_ptr<API> mInstance;
 		const TygerFrameworkPluginInitializeParam* mParam;
