@@ -4,8 +4,9 @@
 #include "API.hpp"
 
 bool TygerFrameworkDrawPluginUi(DrawUIFunc func);
+bool TygerFrameworkPluginImguiHasFocus(ImGuiHasFocusFunc func);
 bool TygerFrameworkPluginWndProc(WndProcFunc func);
-void* TygerFrameworkGetImGuiContext();
+HWND TygerFrameworkGetTyWindowHandle();
 
 class PluginLoader
 {

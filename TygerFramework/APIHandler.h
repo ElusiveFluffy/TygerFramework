@@ -11,11 +11,14 @@ public:
 	void DrawPluginUI();
 	bool AddDrawPluginUIFunc(std::function<void()> func);
 
-	using TyFPluginWndProc = std::function<bool (HWND, UINT, WPARAM, LPARAM)>;
+	bool PluginImGuiHasFocus();
+	bool AddPluginImGuiHasFocusFunc(std::function<bool()> func);
+
+	using TyFPluginWndProc = std::function<bool(HWND, UINT, WPARAM, LPARAM)>;
 	bool PluginWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 	bool AddPluginWndProcFunc(TyFPluginWndProc func);
 private:
 	std::vector<std::function<void()>> mDrawPluginUIFunctions{};
+	std::vector<std::function<bool()>> mPluginImGuiHasFocusFunctions{};
 	std::vector<TyFPluginWndProc> mPluginWndProcFunctions{};
 };
-

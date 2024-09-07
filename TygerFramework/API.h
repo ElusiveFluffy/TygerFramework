@@ -9,17 +9,20 @@ enum LogLevel
 };
 
 typedef void (*DrawUIFunc)();
+typedef bool (*ImGuiHasFocusFunc)();
 typedef bool (*WndProcFunc)(HWND, UINT, WPARAM, LPARAM);
 
 typedef bool (*TyFDrawPluginUI)(DrawUIFunc);
+typedef bool (*TyFPluginImGuiHasFocus)(ImGuiHasFocusFunc);
 typedef bool (*TyFPluginWndProc)(WndProcFunc);
 
 typedef struct {
 	void (*LogPluginMessage)(std::string message, LogLevel logLevel);
 	int (*WhichTyGame)();
 	TyFDrawPluginUI DrawPluginUI;
+	TyFPluginImGuiHasFocus PluginImGuiHasFocus;
 	TyFPluginWndProc PluginWndProc;
-	void* (*GetImGuiContext)();
+	HWND(*GetTyWindowHandle)();
 }TygerFrameworkPluginFunctions;
 
 typedef struct {

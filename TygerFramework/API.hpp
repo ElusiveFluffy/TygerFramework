@@ -45,6 +45,11 @@ namespace TygerFrameworkAPI {
 			return mParam;
 		}
 
+		//Gets the current Ty window handle
+		static HWND GetTyWindowHandle() {
+			return API::Get()->param()->functions->GetTyWindowHandle();
+		}
+
 		/// <summary>
 		/// Gets the current Ty Game
 		/// </summary>
@@ -59,12 +64,6 @@ namespace TygerFrameworkAPI {
 		//Writes a message to the console and the log file. Default log level is info
 		static void LogPluginMessage(std::string message, LogLevel logLevel = Info) {
 			Get()->param()->functions->LogPluginMessage("[" + PluginName + "] " + message, logLevel);
-		}
-
-		//Returns the current ImGui Context 
-		//(Make sure to cast it to ImGuiContext* when setting it. Its a void* so it doesn't cause a error if you don't have ImGui)
-		static void* GetImGuiContext() {
-			return API::Get()->param()->functions->GetImGuiContext();
 		}
 
 	private:

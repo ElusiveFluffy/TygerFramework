@@ -12,7 +12,12 @@ std::shared_ptr<APIHandler>& APIHandler::Get()
 void APIHandler::DrawPluginUI()
 {
 	for (auto&& function : mDrawPluginUIFunctions) {
-		function();
+		try {
+			function();
+		}
+		catch (...) {
+			FrameworkInstance->LogMessage("[API Handler] Error occured when running plugin draw UI");
+		}
 	}
 }
 
@@ -23,13 +28,40 @@ bool APIHandler::AddDrawPluginUIFunc(std::function<void()> func)
 	return true;
 }
 
+bool APIHandler::PluginImGuiHasFocus()
+{
+	bool anyTrue = false;
+	for (auto&& function : mPluginImGuiHasFocusFunctions) {
+		try {
+			if (function()) {
+				anyTrue = true;
+			}
+		}
+		catch (...) {
+			FrameworkInstance->LogMessage("[API Handler] Error occured while checking plugin imgui focus");
+		}
+	}
+	return anyTrue;
+}
+
+bool APIHandler::AddPluginImGuiHasFocusFunc(std::function<bool()> func)
+{
+	mPluginImGuiHasFocusFunctions.push_back(func);
+	return true;
+}
+
 //Returns true if any plugins want to block any WndProc
 bool APIHandler::PluginWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	bool anyTrue = false;
 	for (auto&& function : mPluginWndProcFunctions) {
-		if (function(hWnd, msg, wParam, lParam)) {
-			anyTrue = true;
+		try {
+			if (function(hWnd, msg, wParam, lParam)) {
+				anyTrue = true;
+			}
+		}
+		catch (...) {
+			FrameworkInstance->LogMessage("[API Handler] Error occured when running plugin WndProc");
 		}
 	}
 	return anyTrue;

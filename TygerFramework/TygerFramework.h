@@ -27,6 +27,8 @@ public:
 	bool RememberVisibility = true;
 	bool InputPassthrough = true;
 
+	HWND TyWindowHandle;
+
 private:
 	HMODULE mTygerFrameworkModule;
 	std::ofstream mLogger;

@@ -20,8 +20,9 @@ TygerFrameworkPluginFunctions pluginFunctions{
     tygerFramework::LogPluginMessage,
     tygerFramework::WhichTyGame,
     TygerFrameworkDrawPluginUi,
+    TygerFrameworkPluginImguiHasFocus,
     TygerFrameworkPluginWndProc,
-    TygerFrameworkGetImGuiContext
+    TygerFrameworkGetTyWindowHandle
 };
 
 TygerFrameworkPluginInitializeParam pluginInitParam{
@@ -126,8 +127,16 @@ void PluginLoader::DrawUI() {
 }
 
 //ImGui context to send to plugins
-void* TygerFrameworkGetImGuiContext() {
-    return ImGui::GetCurrentContext();
+HWND TygerFrameworkGetTyWindowHandle() {
+    return FrameworkInstance->TyWindowHandle;
+}
+
+bool TygerFrameworkPluginImguiHasFocus(ImGuiHasFocusFunc func)
+{
+    if (func == nullptr)
+        return false;
+
+    return APIHandler::Get()->AddPluginImGuiHasFocusFunc(func);
 }
 
 //Plugin draw function subscriber

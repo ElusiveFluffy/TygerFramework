@@ -87,13 +87,13 @@ bool GUI::Init() {
 		tyWindowName = "TY3";
 		break;
 	}
-	TyWindowHandle = FindWindowA(NULL, tyWindowName);
+	FrameworkInstance->TyWindowHandle = FindWindowA(NULL, tyWindowName);
 
-	if (!TyWindowHandle) {
+	if (!FrameworkInstance->TyWindowHandle) {
 		FrameworkInstance->LogMessage("[GUI] Failed to Get Ty Window Handle", TygerFramework::Error);
 		return false;
 	}
-	Original_Wndproc = (WNDPROC)SetWindowLongPtrW(TyWindowHandle, GWLP_WNDPROC, (LONG_PTR)WndProc);
+	Original_Wndproc = (WNDPROC)SetWindowLongPtrW(FrameworkInstance->TyWindowHandle, GWLP_WNDPROC, (LONG_PTR)WndProc);
 	FrameworkInstance->LogMessage("[GUI] Successfully Got Ty Window Handle");
 
 	//Hook all the stuff needed to disable mouse input
@@ -106,7 +106,7 @@ bool GUI::Init() {
 
 	ImGuiIO& io = ImGui::GetIO();
 	(void)io;
-	ImGui_ImplWin32_InitForOpenGL(TyWindowHandle);
+	ImGui_ImplWin32_InitForOpenGL(FrameworkInstance->TyWindowHandle);
     ImGui_ImplOpenGL3_Init();
 
 	//Don't set it to false here or it breaks and never shows the cursor
@@ -132,8 +132,11 @@ void GUI::Draw() {
 	if (!GUI::DrawGUI)
 		return;
 
+	//Draw all the plugin windows
+	APIHandler::Get()->DrawPluginUI();
+
 	//Check if any imgui windows are focused for the mouse click hook
-	GUI::ImGuiWindowFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow);
+	GUI::ImGuiWindowFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow) || APIHandler::Get()->PluginImGuiHasFocus();
 
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplWin32_NewFrame();
@@ -155,9 +158,6 @@ void GUI::Draw() {
 	FrameworkInstance->PluginLoader.DrawUI();
 
 	ImGui::End();
-
-	//Draw all the plugin windows
-	APIHandler::Get()->DrawPluginUI();
 
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

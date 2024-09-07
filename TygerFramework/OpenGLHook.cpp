@@ -17,7 +17,7 @@ BOOL WINAPI wglSwapBuffers_Func(HDC hDC) {
 		GUI::Draw();
 
 	//If the checkbox value is different than the visibility, toggle the console
-	if (IsWindowVisible(GetConsoleWindow()) != FrameworkInstance->ShowConsole)
+	if ((IsWindowVisible(GetConsoleWindow()) == TRUE) != FrameworkInstance->ShowConsole)
 		FrameworkInstance->ToggleConsoleVisibility();
 
 	//Run the original function
