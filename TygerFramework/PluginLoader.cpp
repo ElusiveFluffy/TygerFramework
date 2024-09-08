@@ -25,7 +25,8 @@ TygerFrameworkPluginFunctions pluginFunctions{
     TygerFrameworkPluginImguiHasFocus,
     TygerFrameworkPluginWndProc,
     TygerFrameworkGetTyWindowHandle,
-    TygerFrameworkSetImGuiFont
+    TygerFrameworkSetImGuiFont,
+    PluginSetTygerFrameworkImGuiElements
 };
 
 TygerFrameworkPluginInitializeParam pluginInitParam{
@@ -126,6 +127,63 @@ void PluginLoader::DrawUI() {
         }
 
         ImGui::TreePop();
+    }
+}
+
+//Sets all the elements for drawing elements from the plugin in the TygerFramework window
+//Overwrites the old value if the same plugin calls it again
+void PluginSetTygerFrameworkImGuiElements(std::string pluginName, std::vector<TygerFrameworkImGuiParam> param)
+{
+    FrameworkInstance->PluginLoader.PluginImGuiElements.insert_or_assign(pluginName, param);
+}
+
+//Render any of the plugin imgui elements for the TygerFramework window
+void PluginLoader::PluginDrawInTygerFrameworkWindow()
+{
+    for (auto&& [pluginName, elements] : PluginImGuiElements) {
+        for (TygerFrameworkImGuiParam param : elements) {
+            switch (param.ImGuiElement) {
+            case CollapsingHeader:
+                //Return it if the text is blank
+                if (param.Text == "") {
+                    FrameworkInstance->LogMessage("[" + pluginName + "]" + " Error, missing text for CollapsingHeader TygerFramework ImGui function! Returning Early", TygerFramework::Error);
+                    return;
+                }
+
+                //Return out if its closed
+                if (!ImGui::CollapsingHeader(param.Text.c_str()))
+                    return;
+                break;
+            case Text:
+                ImGui::Text(param.Text.c_str());
+                break;
+            case SameLine:
+                ImGui::SameLine();
+                break;
+            case SetTooltip:
+                //Skip it if the text is blank
+                if (param.Text == "") {
+                    FrameworkInstance->LogMessage("[" + pluginName + "]" + " Error, missing text for SetTooltip TygerFramework ImGui function! Skipping", TygerFramework::Error);
+                    break;
+                }
+
+                if (ImGui::IsItemHovered())
+                    ImGui::SetTooltip(param.Text.c_str());
+                break;
+            case TreePush:
+                //Skip it if the text is blank
+                if (param.Text == "") {
+                    FrameworkInstance->LogMessage("[" + pluginName + "]" + " Error, missing text for TreePush TygerFramework ImGui function! Skipping", TygerFramework::Error);
+                    break;
+                }
+
+                ImGui::TreePush(param.Text.c_str());
+                break;
+            case TreePop:
+                ImGui::TreePop();
+                break;
+            }
+        }
     }
 }
 

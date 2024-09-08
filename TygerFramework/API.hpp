@@ -71,6 +71,12 @@ namespace TygerFrameworkAPI {
 			Get()->param()->functions->SetImGuiFont(imguiFont);
 		}
 
+		//Sets all the elements for drawing elements from the plugin in the TygerFramework window
+		//Overwrites the old value if its called again
+		static void SetTygerFrameworkImGuiElements(std::vector<TygerFrameworkImGuiParam> elements) {
+			Get()->param()->functions->SetTyFImGuiElements(PluginName, elements);
+		}
+
 	private:
 		static inline std::unique_ptr<API> mInstance;
 		const TygerFrameworkPluginInitializeParam* mParam;

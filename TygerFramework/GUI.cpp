@@ -156,6 +156,8 @@ void GUI::Draw() {
 		ImGui::SetTooltip("Allows the game to register mouse clicks while the menu is open.");
 	
 	FrameworkInstance->PluginLoader.DrawUI();
+	FrameworkInstance->PluginLoader.PluginDrawInTygerFrameworkWindow();
+
 
 	ImGui::End();
 
