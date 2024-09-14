@@ -3,6 +3,7 @@
 #include "TygerFramework.h"
 #include <fstream>
 #include <filesystem>
+#include <format>
 #include "imgui.h"
 #include "APIHandler.h"
 #include "Fonts/RobotoMedium.hpp"
@@ -83,6 +84,67 @@ void PluginLoader::Initialize() {
     for (auto plugins = mPlugins.begin(); plugins != mPlugins.end();) {
         std::string pluginName = plugins->first;
         HMODULE pluginModule = plugins->second;
+        auto pluginRequiredVersionFunc = (TyFPluginRequiredVersion)GetProcAddress(pluginModule, "TygerFrameworkPluginRequiredVersion");
+
+        //If the plugin doesn't implement the function it just skip it
+        if (pluginRequiredVersionFunc == nullptr) {
+            FrameworkInstance->LogMessage("[Plugin Loader] " + pluginName + " Doesn't Have a TygerFrameworkPluginRequiredVersion Function, Skipping");
+
+            ++plugins;
+            continue;
+        }
+
+        TygerFrameworkPluginVersion requiredVersion{};
+
+        try {
+            pluginRequiredVersionFunc(&requiredVersion);
+        }
+        catch (...) {
+            FrameworkInstance->LogMessage("[Plugin Loader] " + pluginName + "Had An Exception Occur In TygerFrameworkPluginRequiredVersion, Skipping", TygerFramework::Error);
+            mPluginErrors.emplace(pluginName, "An Exception Occured In TygerFrameworkPluginRequiredVersion");
+            FreeLibrary(pluginModule);
+            plugins = mPlugins.erase(plugins);
+            continue;
+        }
+
+        //Check if the plugin requires a specific game
+        if (requiredVersion.GameNumber != 0 && std::to_string(requiredVersion.GameNumber).find(std::to_string(FrameworkInstance->WhichTyGame())) == std::string::npos) {
+            FrameworkInstance->LogMessage(std::format("[Plugin Loader] {} Is Incompatible with Ty {}", pluginName, FrameworkInstance->WhichTyGame()), TygerFramework::Error);
+            mPluginErrors.emplace(pluginName, std::format("Incompatible with Ty {}", FrameworkInstance->WhichTyGame()));
+            FreeLibrary(pluginModule);
+            plugins = mPlugins.erase(plugins);
+            continue;
+        }
+
+        //Check which major and minor version is needed
+        if (requiredVersion.Major > TygerFrameworkPluginVersion_Major || requiredVersion.Minor > TygerFrameworkPluginVersion_Minor) {
+            FrameworkInstance->LogMessage(std::format("[Plugin Loader] {} Requires TygerFramework Version {}.{}.{} or Newer, But Version {}.{}.{} is Installed", 
+                                                       pluginName, 
+                                                       requiredVersion.Major, requiredVersion.Minor, requiredVersion.Patch, //Plugin Required Version
+                                                       TygerFrameworkPluginVersion_Major, TygerFrameworkPluginVersion_Minor, TygerFrameworkPluginVersion_Patch), TygerFramework::Error); //Loader Version
+            mPluginErrors.emplace(pluginName, std::format("Requires TygerFramework Version {}.{}.{} or Newer",
+                                                           requiredVersion.Major, requiredVersion.Minor, requiredVersion.Patch));
+            FreeLibrary(pluginModule);
+            plugins = mPlugins.erase(plugins);
+            continue;
+        }
+
+        //Warn about the patch version
+        //Need to check the minor version so that if the plugin needs a version like 1.1.2 and the loader is on 1.2.0 this doesn't give a false warning
+        if (requiredVersion.Patch > TygerFrameworkPluginVersion_Patch && requiredVersion.Minor == TygerFrameworkPluginVersion_Minor) {
+            FrameworkInstance->LogMessage(std::format("[Plugin Loader] {} Desires Atleast Patch version x.{}.{}", 
+                                                       pluginName, 
+                                                       requiredVersion.Minor, requiredVersion.Patch), TygerFramework::Warning);
+            mPluginWarnings.emplace(pluginName, std::format("Desires Atleast Patch version x.{}.{}", requiredVersion.Minor, requiredVersion.Patch));
+        }
+
+        ++plugins;
+    }
+
+
+    for (auto plugins = mPlugins.begin(); plugins != mPlugins.end();) {
+        std::string pluginName = plugins->first;
+        HMODULE pluginModule = plugins->second;
         auto pluginInitializer = (TyFPluginInitializer)GetProcAddress(pluginModule, "TygerFrameworkPluginInitialize");
 
         //Skip the plugin if it doesn't have the function
@@ -96,6 +158,7 @@ void PluginLoader::Initialize() {
         try {
             if (!pluginInitializer(&pluginInitParam)) {
                 FrameworkInstance->LogMessage("[Plugin Loader] Failed to Initialize: " + pluginName, TygerFramework::Error);
+                mPluginErrors.emplace(pluginName, "Failed to Initialize");
                 FreeLibrary(pluginModule);
                 plugins = mPlugins.erase(plugins);
                 continue;
@@ -103,6 +166,7 @@ void PluginLoader::Initialize() {
         }
         catch (...) {
             FrameworkInstance->LogMessage("[Plugin Loader] " + pluginName + "Had An Exception Occur In TygerFrameworkPluginInitialize, Skipping", TygerFramework::Error);
+            mPluginErrors.emplace(pluginName, "An Exception Occured In TygerFrameworkPluginInitialize");
             FreeLibrary(pluginModule);
             plugins = mPlugins.erase(plugins);
             continue;
@@ -116,17 +180,40 @@ void PluginLoader::Initialize() {
 void PluginLoader::DrawUI() {
     if (ImGui::CollapsingHeader("Plugins")) {
 
-        if (mPlugins.empty()) {
-            ImGui::Text("No Plugins Loaded");
-            return;
+        if (!mPlugins.empty()) {
+            ImGui::Text("Loaded Plugins:");
+            ImGui::TreePush("Plugins");
+            for (auto&& [name, _] : mPlugins) {
+                ImGui::Text(name.c_str());
+            }
+
+            ImGui::TreePop();
         }
-        ImGui::Text("Loaded Plugins:");
-        ImGui::TreePush("Plugins");
-        for (auto&& [name, _] : mPlugins) {
-            ImGui::Text(name.c_str());
+        else {
+            ImGui::Text("No Plugins Loaded");
         }
 
-        ImGui::TreePop();
+        if (!mPluginErrors.empty()) {
+            ImGui::Spacing();
+            ImGui::Text("Plugin Errors:");
+
+            ImGui::TreePush("Plugin Errors");
+            for (auto&& [name, error] : mPluginErrors) {
+                ImGui::TextWrapped("%s - %s", name.c_str(), error.c_str());
+            }
+            ImGui::TreePop();
+        }
+
+        if (!mPluginWarnings.empty()) {
+            ImGui::Spacing();
+            ImGui::Text("Plugin Warnings:");
+
+            ImGui::TreePush("Plugin Warnings");
+            for (auto&& [name, warning] : mPluginWarnings) {
+                ImGui::TextWrapped("%s - %s", name.c_str(), warning.c_str());
+            }
+            ImGui::TreePop();
+        }
     }
 }
 

@@ -21,5 +21,7 @@ public:
 
 private:
 	std::map<std::string, HMODULE> mPlugins{};
+	std::map<std::string, std::string> mPluginErrors{};
+	std::map<std::string, std::string> mPluginWarnings{};
 };
 

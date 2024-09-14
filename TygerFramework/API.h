@@ -2,6 +2,17 @@
 #include <string>
 #include <vector>
 
+constexpr int TygerFrameworkPluginVersion_Major = 1;
+constexpr int TygerFrameworkPluginVersion_Minor = 0;
+constexpr int TygerFrameworkPluginVersion_Patch = 0;
+
+typedef struct {
+	int Major;
+	int Minor;
+	int Patch;
+	int GameNumber; //Optional (If the plugin is compatible with 2 or more games write it out like 12 for Ty 1 and 2. 13 for Ty 1, and 3. Etc. Leave unchanged for any game)
+} TygerFrameworkPluginVersion;
+
 enum LogLevel
 {
 	Info,
@@ -52,3 +63,4 @@ typedef struct {
 }TygerFrameworkPluginInitializeParam;
 
 typedef bool (*TyFPluginInitializer)(const TygerFrameworkPluginInitializeParam*);
+typedef void (*TyFPluginRequiredVersion)(TygerFrameworkPluginVersion*);
