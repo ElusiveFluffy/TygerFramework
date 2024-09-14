@@ -3,6 +3,8 @@
 #include "TygerFramework.h"
 #include "MinHook.h"
 #include "APIHandler.h"
+#include "API.h"
+#include <format>
 
 #include "Fonts/RobotoMedium.hpp"
 #include "imgui.h"
@@ -145,7 +147,8 @@ void GUI::Draw() {
 	//Set the window size once, just to update it to make sure its not too small
 	//when using the saved size and cutting off options when there is more options added
 	ImGui::SetNextWindowSize(ImVec2(285, 200), ImGuiCond_::ImGuiCond_Once);
-	ImGui::Begin("TygerFramework");
+	//The ### allows a internal name to be specified after it, so when the version changes it doesn't reset the saved position of the window
+	ImGui::Begin(std::format("TygerFramework v{}.{}.{}###TygerFramework", TygerFrameworkPluginVersion_Major, TygerFrameworkPluginVersion_Minor, TygerFrameworkPluginVersion_Patch).c_str());
 	ImGui::Text("Menu Key: F1");
 	ImGui::Checkbox("Show Console", &FrameworkInstance->ShowConsole);
 	ImGui::Checkbox("Remember Menu Visibility", &FrameworkInstance->RememberVisibility);
