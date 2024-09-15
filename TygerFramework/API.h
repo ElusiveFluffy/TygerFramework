@@ -26,10 +26,13 @@ enum LogLevel
 enum TyFImGuiElements {
 	CollapsingHeader, //Needs text for header name
 	Text, //Needs text
+	TextWrapped, //Needs text
 	SameLine, //No text
+	NewLine, //No text
+	Spacing, //No text
 	SetTooltip, //Needs text for tooltip (Adds a tooltip to the previous element)
 	TreePush, //Needs texts for tree name
-	TreePop //No text (Make sure to call when done after using TreePush)
+	TreePop, //No text (Make sure to call when done after using TreePush)
 };
 
 typedef struct {

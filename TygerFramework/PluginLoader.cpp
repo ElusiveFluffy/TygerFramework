@@ -244,8 +244,17 @@ void PluginLoader::PluginDrawInTygerFrameworkWindow()
             case Text:
                 ImGui::Text(param.Text.c_str());
                 break;
+            case TextWrapped:
+                ImGui::TextWrapped(param.Text.c_str());
+                break;
             case SameLine:
                 ImGui::SameLine();
+                break;
+            case NewLine:
+                ImGui::NewLine();
+                break;
+            case Spacing:
+                ImGui::Spacing();
                 break;
             case SetTooltip:
                 //Skip it if the text is blank
