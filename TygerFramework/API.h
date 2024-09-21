@@ -32,7 +32,7 @@ enum TyFImGuiElements {
 	Spacing, //No text
 	SetTooltip, //Needs text for tooltip (Adds a tooltip to the previous element)
 	TreePush, //Needs texts for tree name
-	TreePop, //No text (Make sure to call when done after using TreePush)
+	TreePop //No text (Make sure to call when done after using TreePush)
 };
 
 typedef struct {
@@ -43,20 +43,23 @@ typedef struct {
 typedef void (*DrawUIFunc)();
 typedef bool (*ImGuiHasFocusFunc)();
 typedef bool (*WndProcFunc)(HWND, UINT, WPARAM, LPARAM);
+typedef void (*TickBeforeGameFunc)(float deltaSeconds);
 
 typedef bool (*TyFDrawPluginUI)(DrawUIFunc);
 typedef bool (*TyFPluginImGuiHasFocus)(ImGuiHasFocusFunc);
 typedef bool (*TyFPluginWndProc)(WndProcFunc);
+typedef bool (*TyFTickBeforeGame)(TickBeforeGameFunc);
 
 typedef struct {
 	void (*LogPluginMessage)(std::string message, LogLevel logLevel);
 	int (*WhichTyGame)();
-	TyFDrawPluginUI DrawPluginUI;
-	TyFPluginImGuiHasFocus PluginImGuiHasFocus;
-	TyFPluginWndProc PluginWndProc;
+	TyFDrawPluginUI AddDrawPluginUI;
+	TyFPluginImGuiHasFocus AddPluginImGuiHasFocus;
+	TyFPluginWndProc AddPluginWndProc;
 	HWND(*GetTyWindowHandle)();
 	void (*SetImGuiFont)(void* imguiFont);
 	void (*SetTyFImGuiElements)(std::string pluginName, std::vector<TygerFrameworkImGuiParam> params);
+	TyFTickBeforeGame AddTickBeforeGame;
 }TygerFrameworkPluginFunctions;
 
 typedef struct {

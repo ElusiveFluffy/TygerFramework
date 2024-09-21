@@ -27,7 +27,8 @@ TygerFrameworkPluginFunctions pluginFunctions{
     TygerFrameworkPluginWndProc,
     TygerFrameworkGetTyWindowHandle,
     TygerFrameworkSetImGuiFont,
-    PluginSetTygerFrameworkImGuiElements
+    PluginSetTygerFrameworkImGuiElements,
+    TygerFrameworkTickBeforeGame
 };
 
 TygerFrameworkPluginInitializeParam pluginInitParam{
@@ -325,4 +326,13 @@ bool TygerFrameworkPluginWndProc(WndProcFunc func) {
         return false;
 
     return APIHandler::Get()->AddPluginWndProcFunc(func);
+}
+
+bool TygerFrameworkTickBeforeGame(TickBeforeGameFunc func)
+{
+    if (func == nullptr)
+        return false;
+
+    APIHandler::Get()->AddTickBeforeGameFunc(func);
+    return true;
 }

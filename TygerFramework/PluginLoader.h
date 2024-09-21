@@ -9,6 +9,7 @@ bool TygerFrameworkPluginWndProc(WndProcFunc func);
 HWND TygerFrameworkGetTyWindowHandle();
 void TygerFrameworkSetImGuiFont(void* fonts);
 void PluginSetTygerFrameworkImGuiElements(std::string pluginName, std::vector<TygerFrameworkImGuiParam> param);
+bool TygerFrameworkTickBeforeGame(TickBeforeGameFunc func);
 
 class PluginLoader
 {

@@ -130,40 +130,53 @@ void GUI::SetImGuiStyle() {
 	fonts->Build();
 }
 
+float LastFrameFPS = 0;
+
 void GUI::Draw() {
-	if (!GUI::DrawGUI)
-		return;
 
-	//Draw all the plugin windows
-	APIHandler::Get()->DrawPluginUI();
-
-	//Check if any imgui windows are focused for the mouse click hook
-	GUI::ImGuiWindowFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow) || APIHandler::Get()->PluginImGuiHasFocus();
-
+	//Need to be called before NewFrame
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplWin32_NewFrame();
+	//New fps average calculated to be used for the tick
 	ImGui::NewFrame();
 
-	//Set the window size once, just to update it to make sure its not too small
-	//when using the saved size and cutting off options when there is more options added
-	ImGui::SetNextWindowSize(ImVec2(285, 200), ImGuiCond_::ImGuiCond_Once);
-	//The ### allows a internal name to be specified after it, so when the version changes it doesn't reset the saved position of the window
-	ImGui::Begin(std::format("TygerFramework v{}.{}.{}###TygerFramework", TygerFrameworkPluginVersion_Major, TygerFrameworkPluginVersion_Minor, TygerFrameworkPluginVersion_Patch).c_str());
-	ImGui::Text("Menu Key: F1");
-	ImGui::Checkbox("Show Console", &FrameworkInstance->ShowConsole);
-	ImGui::Checkbox("Remember Menu Visibility", &FrameworkInstance->RememberVisibility);
-	ImGui::Checkbox("Allow Input Passthrough", &FrameworkInstance->InputPassthrough);
-	ImGui::SameLine();
-	ImGui::Text("(?)");
-	if (ImGui::IsItemHovered())
-		ImGui::SetTooltip("Allows the game to register mouse clicks while the menu is open.");
-	
-	FrameworkInstance->PluginLoader.DrawUI();
-	FrameworkInstance->PluginLoader.PluginDrawInTygerFrameworkWindow();
+	//Weird ImGui draw loop so the ImGui's framerate function can be used, which has a rolling average fps which is more accurate
+	//Check if the framerate is higher than 10 (mainly incase you tabbed out of the game), if it is less then 10 then use the last frame fps
+	if (ImGui::GetIO().Framerate > 10) {
+		APIHandler::Get()->TickBeforeGame(1.0f / ImGui::GetIO().Framerate);
+		LastFrameFPS = ImGui::GetIO().Framerate;
+	}
+	else
+		APIHandler::Get()->TickBeforeGame(1.0f / LastFrameFPS);
+
+	//Draw ImGui windows
+	if (GUI::DrawGUI) {
+		//Draw all the plugin windows
+		APIHandler::Get()->DrawPluginUI();
+
+		//Check if any imgui windows are focused for the mouse click hook
+		GUI::ImGuiWindowFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow) || APIHandler::Get()->PluginImGuiHasFocus();
+		//Set the window size once, just to update it to make sure its not too small
+		//when using the saved size and cutting off options when there is more options added
+		ImGui::SetNextWindowSize(ImVec2(285, 200), ImGuiCond_::ImGuiCond_Once);
+		//The ### allows a internal name to be specified after it, so when the version changes it doesn't reset the saved position of the window
+		ImGui::Begin(std::format("TygerFramework v{}.{}.{}###TygerFramework", TygerFrameworkPluginVersion_Major, TygerFrameworkPluginVersion_Minor, TygerFrameworkPluginVersion_Patch).c_str());
+		ImGui::Text("Menu Key: F1");
+		ImGui::Checkbox("Show Console", &FrameworkInstance->ShowConsole);
+		ImGui::Checkbox("Remember Menu Visibility", &FrameworkInstance->RememberVisibility);
+		ImGui::Checkbox("Allow Input Passthrough", &FrameworkInstance->InputPassthrough);
+		ImGui::SameLine();
+		ImGui::Text("(?)");
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip("Allows the game to register mouse clicks while the menu is open.");
+
+		FrameworkInstance->PluginLoader.DrawUI();
+		FrameworkInstance->PluginLoader.PluginDrawInTygerFrameworkWindow();
 
 
-	ImGui::End();
-
+		ImGui::End();
+	}
+	//Needs to be called after NewFrame
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }

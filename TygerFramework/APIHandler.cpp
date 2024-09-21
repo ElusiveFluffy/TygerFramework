@@ -73,3 +73,20 @@ bool APIHandler::AddPluginWndProcFunc(TyFPluginWndProc func)
 	mPluginWndProcFunctions.push_back(func);
 	return true;
 }
+
+void APIHandler::TickBeforeGame(float deltaSeconds)
+{
+	for (auto&& function : mTickBeforeGameFunctions) {
+		try {
+			function(deltaSeconds);
+		}
+		catch (...) {
+			FrameworkInstance->LogMessage("[API Handler] Error occured when running plugin tick before game");
+		}
+	}
+}
+
+void APIHandler::AddTickBeforeGameFunc(std::function<void(float deltaSeconds)> func)
+{
+	mTickBeforeGameFunctions.push_back(func);
+}
