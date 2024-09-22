@@ -302,37 +302,37 @@ void TygerFrameworkSetImGuiFont(void* imguiFont)
     fonts->Build();
 }
 
-bool TygerFrameworkPluginImguiHasFocus(ImGuiHasFocusFunc func)
+bool TygerFrameworkPluginImguiHasFocus(std::string pluginName, ImGuiHasFocusFunc func)
 {
     if (func == nullptr)
         return false;
 
-    return APIHandler::Get()->AddPluginImGuiHasFocusFunc(func);
+    return APIHandler::Get()->AddPluginImGuiHasFocusFunc({pluginName, func});
 }
 
 //Plugin draw function subscriber
-bool TygerFrameworkDrawPluginUi(DrawUIFunc func)
+bool TygerFrameworkDrawPluginUi(std::string pluginName, DrawUIFunc func)
 {
     if (func == nullptr)
         return false;
 
-    return APIHandler::Get()->AddDrawPluginUIFunc(func);
+    return APIHandler::Get()->AddDrawPluginUIFunc({pluginName, func});
 }
 
 //Plugin WndProc function subscriber
-bool TygerFrameworkPluginWndProc(WndProcFunc func) {
+bool TygerFrameworkPluginWndProc(std::string pluginName, WndProcFunc func) {
 
     if (func == nullptr)
         return false;
 
-    return APIHandler::Get()->AddPluginWndProcFunc(func);
+    return APIHandler::Get()->AddPluginWndProcFunc({pluginName, func});
 }
 
-bool TygerFrameworkTickBeforeGame(TickBeforeGameFunc func)
+bool TygerFrameworkTickBeforeGame(std::string pluginName, TickBeforeGameFunc func)
 {
     if (func == nullptr)
         return false;
 
-    APIHandler::Get()->AddTickBeforeGameFunc(func);
+    APIHandler::Get()->AddTickBeforeGameFunc({pluginName, func});
     return true;
 }

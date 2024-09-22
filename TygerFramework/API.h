@@ -43,12 +43,12 @@ typedef struct {
 typedef void (*DrawUIFunc)();
 typedef bool (*ImGuiHasFocusFunc)();
 typedef bool (*WndProcFunc)(HWND, UINT, WPARAM, LPARAM);
-typedef void (*TickBeforeGameFunc)(float deltaSeconds);
+typedef void (*TickBeforeGameFunc)(float);
 
-typedef bool (*TyFDrawPluginUI)(DrawUIFunc);
-typedef bool (*TyFPluginImGuiHasFocus)(ImGuiHasFocusFunc);
-typedef bool (*TyFPluginWndProc)(WndProcFunc);
-typedef bool (*TyFTickBeforeGame)(TickBeforeGameFunc);
+typedef bool (*TyFDrawPluginUI)(std::string, DrawUIFunc);
+typedef bool (*TyFPluginImGuiHasFocus)(std::string, ImGuiHasFocusFunc);
+typedef bool (*TyFPluginWndProc)(std::string, WndProcFunc);
+typedef bool (*TyFTickBeforeGame)(std::string, TickBeforeGameFunc);
 
 typedef struct {
 	void (*LogPluginMessage)(std::string message, LogLevel logLevel);

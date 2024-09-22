@@ -158,7 +158,7 @@ void GUI::Draw() {
 		GUI::ImGuiWindowFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow) || APIHandler::Get()->PluginImGuiHasFocus();
 		//Set the window size once, just to update it to make sure its not too small
 		//when using the saved size and cutting off options when there is more options added
-		ImGui::SetNextWindowSize(ImVec2(285, 200), ImGuiCond_::ImGuiCond_Once);
+		ImGui::SetNextWindowSize(ImVec2(285, 235), ImGuiCond_::ImGuiCond_Once);
 		//The ### allows a internal name to be specified after it, so when the version changes it doesn't reset the saved position of the window
 		ImGui::Begin(std::format("TygerFramework v{}.{}.{}###TygerFramework", TygerFrameworkPluginVersion_Major, TygerFrameworkPluginVersion_Minor, TygerFrameworkPluginVersion_Patch).c_str());
 		ImGui::Text("Menu Key: F1");

@@ -11,42 +11,42 @@ std::shared_ptr<APIHandler>& APIHandler::Get()
 //Run all the UI code for subscribed plugins
 void APIHandler::DrawPluginUI()
 {
-	for (auto&& function : mDrawPluginUIFunctions) {
+	for (auto&& params : mDrawPluginUIParams) {
 		try {
-			function();
+			params.Function();
 		}
 		catch (...) {
-			FrameworkInstance->LogMessage("[API Handler] Error occured when running plugin draw UI");
+			FrameworkInstance->LogMessage("[API Handler] " + params.PluginName + " had an error occur when running plugin draw UI", TygerFramework::Error);
 		}
 	}
 }
 
 //Subscribe plugin functions to the Draw UI loop
-bool APIHandler::AddDrawPluginUIFunc(std::function<void()> func)
+bool APIHandler::AddDrawPluginUIFunc(DrawPluginUIParam param)
 {
-	mDrawPluginUIFunctions.push_back(func);
+	mDrawPluginUIParams.push_back(param);
 	return true;
 }
 
 bool APIHandler::PluginImGuiHasFocus()
 {
 	bool anyTrue = false;
-	for (auto&& function : mPluginImGuiHasFocusFunctions) {
+	for (auto&& params : mPluginImGuiHasFocusParams) {
 		try {
-			if (function()) {
+			if (params.Function()) {
 				anyTrue = true;
 			}
 		}
 		catch (...) {
-			FrameworkInstance->LogMessage("[API Handler] Error occured while checking plugin imgui focus");
+			FrameworkInstance->LogMessage("[API Handler] " + params.PluginName + " had an error occur while checking plugin imgui focus", TygerFramework::Error);
 		}
 	}
 	return anyTrue;
 }
 
-bool APIHandler::AddPluginImGuiHasFocusFunc(std::function<bool()> func)
+bool APIHandler::AddPluginImGuiHasFocusFunc(PluginImGuiHasFocusParam param)
 {
-	mPluginImGuiHasFocusFunctions.push_back(func);
+	mPluginImGuiHasFocusParams.push_back(param);
 	return true;
 }
 
@@ -54,39 +54,39 @@ bool APIHandler::AddPluginImGuiHasFocusFunc(std::function<bool()> func)
 bool APIHandler::PluginWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	bool anyTrue = false;
-	for (auto&& function : mPluginWndProcFunctions) {
+	for (auto&& params : mPluginWndProcParams) {
 		try {
-			if (function(hWnd, msg, wParam, lParam)) {
+			if (params.Function(hWnd, msg, wParam, lParam)) {
 				anyTrue = true;
 			}
 		}
 		catch (...) {
-			FrameworkInstance->LogMessage("[API Handler] Error occured when running plugin WndProc");
+			FrameworkInstance->LogMessage("[API Handler] " + params.PluginName + " had an error occur when running plugin WndProc", TygerFramework::Error);
 		}
 	}
 	return anyTrue;
 }
 
 //Subscribe plugin functions to the WndProc loop
-bool APIHandler::AddPluginWndProcFunc(TyFPluginWndProc func)
+bool APIHandler::AddPluginWndProcFunc(PluginWndProcParam param)
 {
-	mPluginWndProcFunctions.push_back(func);
+	mPluginWndProcParams.push_back(param);
 	return true;
 }
 
 void APIHandler::TickBeforeGame(float deltaSeconds)
 {
-	for (auto&& function : mTickBeforeGameFunctions) {
+	for (auto&& params : mTickBeforeGameParams) {
 		try {
-			function(deltaSeconds);
+			params.Function(deltaSeconds);
 		}
 		catch (...) {
-			FrameworkInstance->LogMessage("[API Handler] Error occured when running plugin tick before game");
+			FrameworkInstance->LogMessage("[API Handler] " + params.PluginName + " had an error occur when running plugin tick before game", TygerFramework::Error);
 		}
 	}
 }
 
-void APIHandler::AddTickBeforeGameFunc(std::function<void(float deltaSeconds)> func)
+void APIHandler::AddTickBeforeGameFunc(TickBeforeGameParam param)
 {
-	mTickBeforeGameFunctions.push_back(func);
+	mTickBeforeGameParams.push_back(param);
 }

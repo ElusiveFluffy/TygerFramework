@@ -77,6 +77,26 @@ namespace TygerFrameworkAPI {
 			Get()->param()->functions->SetTyFImGuiElements(PluginName, elements);
 		}
 
+		//--------------------------
+		//Event subscriber functions
+		//--------------------------
+
+		static bool AddDrawPluginUI(DrawUIFunc func) {
+			return Get()->param()->functions->AddDrawPluginUI(PluginName, func);
+		}
+
+		static bool AddPluginImGuiHasFocus(ImGuiHasFocusFunc func) {
+			return Get()->param()->functions->AddPluginImGuiHasFocus(PluginName, func);
+		}
+
+		static bool AddPluginWndProc(WndProcFunc func) {
+			return Get()->param()->functions->AddPluginWndProc(PluginName, func);
+		}
+
+		static bool AddTickBeforeGame(TickBeforeGameFunc func) {
+			return Get()->param()->functions->AddTickBeforeGame(PluginName, func);
+		}
+
 	private:
 		static inline std::unique_ptr<API> mInstance;
 		const TygerFrameworkPluginInitializeParam* mParam;
