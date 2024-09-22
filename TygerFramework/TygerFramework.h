@@ -24,6 +24,7 @@ public:
 
 	//UI Settings
 	bool ShowConsole;
+	bool TyLogInConsole;
 	bool RememberVisibility = true;
 	bool InputPassthrough = true;
 
@@ -41,6 +42,8 @@ private:
 	void CreateConsole();
 	void SaveSettings();
 	void LoadSettings();
+
+	bool HookTyDebugOutput();
 };
 
 extern std::unique_ptr<TygerFramework> FrameworkInstance;

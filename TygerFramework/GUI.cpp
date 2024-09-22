@@ -163,6 +163,11 @@ void GUI::Draw() {
 		ImGui::Begin(std::format("TygerFramework v{}.{}.{}###TygerFramework", TygerFrameworkPluginVersion_Major, TygerFrameworkPluginVersion_Minor, TygerFrameworkPluginVersion_Patch).c_str());
 		ImGui::Text("Menu Key: F1");
 		ImGui::Checkbox("Show Console", &FrameworkInstance->ShowConsole);
+		ImGui::Checkbox("Show Ty Log Output", &FrameworkInstance->TyLogInConsole);
+		ImGui::SameLine();
+		ImGui::Text("(?)");
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip("Output's the game's log to the console too.");
 		ImGui::Checkbox("Remember Menu Visibility", &FrameworkInstance->RememberVisibility);
 		ImGui::Checkbox("Allow Input Passthrough", &FrameworkInstance->InputPassthrough);
 		ImGui::SameLine();

@@ -11,6 +11,9 @@ namespace fs = std::filesystem;
 
 std::unique_ptr<TygerFramework> FrameworkInstance;
 
+typedef void(WINAPI* OutputDebugString_t) (LPCSTR lpOutputString);
+OutputDebugString_t Original_OutputDebugString;
+
 std::filesystem::path TygerFramework::GetPluginDir() {
     return fs::current_path() / "Plugins";
 }
@@ -70,6 +73,12 @@ TygerFramework::TygerFramework(HMODULE tygerFrameworkModule)
         LogMessage("[TygerFramework] Failed to Initialize Minhook, With the Error: " + error, Error);
     }
 
+    //Hook the output of the Ty Log
+    if (!HookTyDebugOutput())
+        LogMessage("[Ty Log Hook] Failed to Hook the Ty Log", Error);
+    else
+        LogMessage("[Ty Log Hook] Sucessfully Hooked the Ty Log");
+
     //Hook OpenGL Swap Buffers Function
     if (!OpenGLHook::Hook()) {
         LogMessage("[OpenGL Hook] Failed to Hook the OpenGL Swap Buffers Function", Error);
@@ -77,6 +86,33 @@ TygerFramework::TygerFramework(HMODULE tygerFrameworkModule)
     else {
         LogMessage("[OpenGL Hook] Sucessfully Hooked OpenGL Swap Buffers Function");
     }
+}
+
+//Simple way to get the Ty log output, rather than constantly checking if the txt file has changed
+void WINAPI TyOutputDebugString(LPCSTR lpOutputString) {
+    //Only log to the console if the option is enabled
+    if (FrameworkInstance->TyLogInConsole)
+        std::cout << "[Ty Log] " << lpOutputString;
+    Original_OutputDebugString(lpOutputString);
+}
+
+bool TygerFramework::HookTyDebugOutput()
+{
+    MH_STATUS minHookStatus = MH_CreateHookApi(L"Kernel32.dll", "OutputDebugStringA", &TyOutputDebugString, reinterpret_cast<LPVOID*>(&Original_OutputDebugString));
+    if (minHookStatus != MH_OK) {
+        std::string error = MH_StatusToString(minHookStatus);
+        LogMessage("[Ty Log Hook] Failed to Create the Ty Log Hook, With the Error: " + error, TygerFramework::Error);
+        return false;
+    }
+
+    minHookStatus = MH_EnableHook(MH_ALL_HOOKS);
+    if (minHookStatus != MH_OK) {
+        std::string error = MH_StatusToString(minHookStatus);
+        LogMessage("[Ty Log Hook] Failed to Enable the Ty Log Hook, With the Error: " + error, TygerFramework::Error);
+        return false;
+    }
+
+    return true;
 }
 
 void TygerFramework::Shutdown() {
@@ -97,6 +133,7 @@ void TygerFramework::SaveSettings() {
     settings.add_section("TygerFramework");
     //Save the data, [Section name], (Value name, value)
     settings["TygerFramework"].set<bool>("ShowConsole", ShowConsole);
+    settings["TygerFramework"].set<bool>("TyLogInConsole", TyLogInConsole);
 
     //Create GUI section
     settings.add_section("GUI");
@@ -131,6 +168,8 @@ void TygerFramework::LoadSettings() {
             if (!ShowConsole)
                 ShowWindow(GetConsoleWindow(), SW_HIDE);
         }
+        if (tygerFrameworkSection.has_key("TyLogInConsole"))
+            TyLogInConsole = tygerFrameworkSection.get<bool>("TyLogInConsole");
     }
     //GUI section
     if (settings.has_section("GUI")) {
