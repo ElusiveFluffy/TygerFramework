@@ -158,16 +158,17 @@ void GUI::Draw() {
 		GUI::ImGuiWindowFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow) || APIHandler::Get()->PluginImGuiHasFocus();
 		//Set the window size once, just to update it to make sure its not too small
 		//when using the saved size and cutting off options when there is more options added
-		ImGui::SetNextWindowSize(ImVec2(285, 235), ImGuiCond_::ImGuiCond_Once);
+		ImGui::SetNextWindowSize(ImVec2(285, 240), ImGuiCond_::ImGuiCond_Once);
 		//The ### allows a internal name to be specified after it, so when the version changes it doesn't reset the saved position of the window
 		ImGui::Begin(std::format("TygerFramework v{}.{}.{}###TygerFramework", TygerFrameworkPluginVersion_Major, TygerFrameworkPluginVersion_Minor, TygerFrameworkPluginVersion_Patch).c_str());
 		ImGui::Text("Menu Key: F1");
 		ImGui::Checkbox("Show Console", &FrameworkInstance->ShowConsole);
-		ImGui::Checkbox("Show Ty Log Output", &FrameworkInstance->TyLogInConsole);
+		ImGui::Checkbox("Show Ty Log in the Console", &FrameworkInstance->TyLogInConsole);
 		ImGui::SameLine();
 		ImGui::Text("(?)");
 		if (ImGui::IsItemHovered())
 			ImGui::SetTooltip("Output's the game's log to the console too.");
+		ImGui::Spacing();
 		ImGui::Checkbox("Remember Menu Visibility", &FrameworkInstance->RememberVisibility);
 		ImGui::Checkbox("Allow Input Passthrough", &FrameworkInstance->InputPassthrough);
 		ImGui::SameLine();
