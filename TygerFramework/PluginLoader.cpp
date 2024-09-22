@@ -60,6 +60,7 @@ void PluginLoader::EarlyInit() try {
 
             if (module == nullptr) {
                 FrameworkInstance->LogMessage("[Plugin Loader] Failed to Load Plugin: " + path.stem().string(), TygerFramework::Error);
+                mPluginErrors.emplace(path.stem().string(), "Failed to Load");
                 continue;
             }
 
@@ -158,8 +159,16 @@ void PluginLoader::Initialize() {
         FrameworkInstance->LogMessage("[Plugin Loader] Initializing: " + pluginName);
         try {
             if (!pluginInitializer(&pluginInitParam)) {
-                FrameworkInstance->LogMessage("[Plugin Loader] Failed to Initialize: " + pluginName, TygerFramework::Error);
-                mPluginErrors.emplace(pluginName, "Failed to Initialize");
+                if (pluginInitParam.initErrorMessage != "")
+                {
+                    FrameworkInstance->LogMessage("[Plugin Loader] Failed to Initialize: " + pluginName + ", With the Error: " + pluginInitParam.initErrorMessage, TygerFramework::Error);
+                    mPluginErrors.emplace(pluginName, "Failed to Initialize: " + pluginInitParam.initErrorMessage);
+                }
+                else
+                {
+                    FrameworkInstance->LogMessage("[Plugin Loader] Failed to Initialize: " + pluginName + ", With No Error Message Provided", TygerFramework::Error);
+                    mPluginErrors.emplace(pluginName, "Failed to Initialize: No Error Message Provided");
+                }
                 FreeLibrary(pluginModule);
                 plugins = mPlugins.erase(plugins);
                 continue;
