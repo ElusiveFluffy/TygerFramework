@@ -48,10 +48,10 @@
     <ClInclude Include="TygerFramework.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="API.h">
+    <ClInclude Include="TygerFrameworkAPI.h">
       <Filter>Header Files\API</Filter>
     </ClInclude>
-    <ClInclude Include="API.hpp">
+    <ClInclude Include="TygerFrameworkAPI.hpp">
       <Filter>Header Files\API</Filter>
     </ClInclude>
     <ClInclude Include="OpenGLHook.h">

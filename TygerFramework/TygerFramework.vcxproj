@@ -159,8 +159,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="API.h" />
-    <ClInclude Include="API.hpp" />
+    <ClInclude Include="TygerFrameworkAPI.h" />
+    <ClInclude Include="TygerFrameworkAPI.hpp" />
     <ClInclude Include="APIHandler.h" />
     <ClInclude Include="dllmain.h" />
     <ClInclude Include="Fonts\RobotoMedium.hpp" />

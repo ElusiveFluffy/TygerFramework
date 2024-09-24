@@ -1,7 +1,7 @@
 #pragma once
 #include <map>
 #include <string>
-#include "API.hpp"
+#include "TygerFrameworkAPI.hpp"
 
 bool TygerFrameworkDrawPluginUi(std::string pluginName, DrawUIFunc func);
 bool TygerFrameworkPluginImguiHasFocus(std::string pluginName, ImGuiHasFocusFunc func);

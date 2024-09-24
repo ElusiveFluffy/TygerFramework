@@ -3,7 +3,7 @@
 #include "TygerFramework.h"
 #include "MinHook.h"
 #include "APIHandler.h"
-#include "API.h"
+#include "TygerFrameworkAPI.h"
 #include <format>
 
 #include "Fonts/RobotoMedium.hpp"
