@@ -110,7 +110,7 @@ void PluginLoader::Initialize() {
         }
 
         //Check if the plugin requires a specific game
-        if (requiredVersion.GameNumber != 0 && std::to_string(requiredVersion.GameNumber).find(std::to_string(FrameworkInstance->WhichTyGame())) == std::string::npos) {
+        if (requiredVersion.CompatibleGames.size() != 0 && std::find(std::begin(requiredVersion.CompatibleGames), std::end(requiredVersion.CompatibleGames), FrameworkInstance->WhichTyGame()) == std::end(requiredVersion.CompatibleGames)) {
             FrameworkInstance->LogMessage(std::format("[Plugin Loader] {} Is Incompatible with Ty {}", pluginName, FrameworkInstance->WhichTyGame()), TygerFramework::Error);
             mPluginErrors.emplace(pluginName, std::format("Incompatible with Ty {}", FrameworkInstance->WhichTyGame()));
             FreeLibrary(pluginModule);

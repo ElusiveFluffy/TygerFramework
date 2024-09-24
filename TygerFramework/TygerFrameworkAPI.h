@@ -10,7 +10,7 @@ typedef struct {
 	int Major;
 	int Minor;
 	int Patch;
-	int GameNumber; //Optional (If the plugin is compatible with 2 or more games write it out like 12 for Ty 1 and 2. 13 for Ty 1, and 3. Etc. Leave unchanged for any game)
+	std::vector<int> CompatibleGames; //Optional (List all the game numbers the plugin is compatible with (1 = Ty 1, 2 = Ty 2, 3 = Ty 3). Leave unchanged if it supports any game)
 } TygerFrameworkPluginVersion;
 
 enum LogLevel
