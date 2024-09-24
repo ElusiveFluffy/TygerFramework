@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="API">
-      <UniqueIdentifier>{87eb4759-3c4c-403d-8972-4f9c6b9fbdaf}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Include">
       <UniqueIdentifier>{7f5c4a3c-ec47-40bf-8bed-89060d7d0fd5}</UniqueIdentifier>
     </Filter>
@@ -24,6 +21,15 @@
     </Filter>
     <Filter Include="Include\ImGui\backends">
       <UniqueIdentifier>{a06a574f-8707-41bd-8384-d0a8df166f92}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\API">
+      <UniqueIdentifier>{87eb4759-3c4c-403d-8972-4f9c6b9fbdaf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\API">
+      <UniqueIdentifier>{26d5648b-b6c6-4e8a-bf50-89438b059347}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fonts">
+      <UniqueIdentifier>{5dbf0923-6f83-4ecf-98b4-d1c509921e08}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -43,10 +49,10 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="API.h">
-      <Filter>API</Filter>
+      <Filter>Header Files\API</Filter>
     </ClInclude>
     <ClInclude Include="API.hpp">
-      <Filter>API</Filter>
+      <Filter>Header Files\API</Filter>
     </ClInclude>
     <ClInclude Include="OpenGLHook.h">
       <Filter>Header Files</Filter>
@@ -84,11 +90,11 @@
     <ClInclude Include="Include\ini.h">
       <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="Fonts\RobotoMedium.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="APIHandler.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\API</Filter>
+    </ClInclude>
+    <ClInclude Include="Fonts\RobotoMedium.hpp">
+      <Filter>Fonts</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -132,7 +138,7 @@
       <Filter>Include\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="APIHandler.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\API</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
