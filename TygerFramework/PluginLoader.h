@@ -7,6 +7,7 @@ bool TygerFrameworkDrawPluginUi(std::string pluginName, DrawUIFunc func);
 bool TygerFrameworkPluginImguiHasFocus(std::string pluginName, ImGuiHasFocusFunc func);
 bool TygerFrameworkPluginWndProc(std::string pluginName, WndProcFunc func);
 HWND TygerFrameworkGetTyWindowHandle();
+bool TygerFrameworkDrawingGUI();
 void TygerFrameworkSetImGuiFont(void* fonts);
 void PluginSetTygerFrameworkImGuiElements(std::string pluginName, std::vector<TygerFrameworkImGuiParam> param);
 bool TygerFrameworkTickBeforeGame(std::string pluginName, TickBeforeGameFunc func);

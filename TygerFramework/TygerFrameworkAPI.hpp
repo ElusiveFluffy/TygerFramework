@@ -49,6 +49,11 @@ public:
 		return API::Get()->param()->functions->GetTyWindowHandle();
 	}
 
+	//Gets if TygerFramework is drawing the GUI. Only use for imgui if you have a special use case
+	static bool DrawingGUI() {
+		return API::Get()->param()->functions->DrawingGUI();
+	}
+
 	/// <summary>
 	/// Gets the current Ty Game
 	/// </summary>

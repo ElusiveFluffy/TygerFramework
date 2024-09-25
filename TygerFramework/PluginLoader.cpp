@@ -26,6 +26,7 @@ TygerFrameworkPluginFunctions pluginFunctions{
     TygerFrameworkPluginImguiHasFocus,
     TygerFrameworkPluginWndProc,
     TygerFrameworkGetTyWindowHandle,
+    TygerFrameworkDrawingGUI,
     TygerFrameworkSetImGuiFont,
     PluginSetTygerFrameworkImGuiElements,
     TygerFrameworkTickBeforeGame
@@ -296,6 +297,11 @@ void PluginLoader::PluginDrawInTygerFrameworkWindow()
 //ImGui context to send to plugins
 HWND TygerFrameworkGetTyWindowHandle() {
     return FrameworkInstance->TyWindowHandle;
+}
+
+bool TygerFrameworkDrawingGUI()
+{
+    return GUI::DrawGUI;
 }
 
 //Sets the plugin's ImGui's font to match the one the loader uses
