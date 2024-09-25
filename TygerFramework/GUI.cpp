@@ -78,7 +78,7 @@ bool GUI::Init() {
 	LPCSTR tyWindowName = "";
 
 	//Switch based on which game is running to look for the correct window handle
-	switch (FrameworkInstance->WhichTyGame()) {
+	switch (FrameworkInstance->CurrentTyGame()) {
 	case 1:
 		tyWindowName = "TY the Tasmanian Tiger";
 		break;

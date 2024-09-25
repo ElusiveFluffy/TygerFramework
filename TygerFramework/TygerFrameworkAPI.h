@@ -52,7 +52,7 @@ typedef bool (*TyFTickBeforeGame)(std::string, TickBeforeGameFunc);
 
 typedef struct {
 	void (*LogPluginMessage)(std::string message, LogLevel logLevel);
-	int (*WhichTyGame)();
+	int (*CurrentTyGame)();
 	TyFDrawPluginUI AddDrawPluginUI;
 	TyFPluginImGuiHasFocus AddPluginImGuiHasFocus;
 	TyFPluginWndProc AddPluginWndProc;

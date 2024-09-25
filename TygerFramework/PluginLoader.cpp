@@ -14,14 +14,14 @@ namespace tygerFramework {
         FrameworkInstance->LogMessage(message, (TygerFramework::LogLevel)logLevel);
     }
 
-    int WhichTyGame() {
-        return FrameworkInstance->WhichTyGame();
+    int CurrentTyGame() {
+        return FrameworkInstance->CurrentTyGame();
     }
 }
 
 TygerFrameworkPluginFunctions pluginFunctions{
     tygerFramework::LogPluginMessage,
-    tygerFramework::WhichTyGame,
+    tygerFramework::CurrentTyGame,
     TygerFrameworkDrawPluginUi,
     TygerFrameworkPluginImguiHasFocus,
     TygerFrameworkPluginWndProc,
@@ -111,9 +111,9 @@ void PluginLoader::Initialize() {
         }
 
         //Check if the plugin requires a specific game
-        if (requiredVersion.CompatibleGames.size() != 0 && std::find(std::begin(requiredVersion.CompatibleGames), std::end(requiredVersion.CompatibleGames), FrameworkInstance->WhichTyGame()) == std::end(requiredVersion.CompatibleGames)) {
-            FrameworkInstance->LogMessage(std::format("[Plugin Loader] {} Is Incompatible with Ty {}", pluginName, FrameworkInstance->WhichTyGame()), TygerFramework::Error);
-            mPluginErrors.emplace(pluginName, std::format("Incompatible with Ty {}", FrameworkInstance->WhichTyGame()));
+        if (requiredVersion.CompatibleGames.size() != 0 && std::find(std::begin(requiredVersion.CompatibleGames), std::end(requiredVersion.CompatibleGames), FrameworkInstance->CurrentTyGame()) == std::end(requiredVersion.CompatibleGames)) {
+            FrameworkInstance->LogMessage(std::format("[Plugin Loader] {} Is Incompatible with Ty {}", pluginName, FrameworkInstance->CurrentTyGame()), TygerFramework::Error);
+            mPluginErrors.emplace(pluginName, std::format("Incompatible with Ty {}", FrameworkInstance->CurrentTyGame()));
             FreeLibrary(pluginModule);
             plugins = mPlugins.erase(plugins);
             continue;

@@ -55,14 +55,14 @@ public:
 	}
 
 	/// <summary>
-	/// Gets the current Ty Game
+	/// Gets the currently running Ty Game
 	/// </summary>
 	/// <returns>0: Couldn't detect which game
 	/// <para>1: Ty 1</para>
 	/// <para>2: Ty 2</para>
 	/// <para>3: Ty 3</para></returns>
-	static int WhichTyGame() {
-		return Get()->param()->functions->WhichTyGame();
+	static int CurrentTyGame() {
+		return Get()->param()->functions->CurrentTyGame();
 	}
 
 	//Writes a message to the console and the log file. Default log level is info
