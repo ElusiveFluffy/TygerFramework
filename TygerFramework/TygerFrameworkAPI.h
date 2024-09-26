@@ -4,7 +4,7 @@
 
 constexpr int TygerFrameworkPluginVersion_Major = 1;
 constexpr int TygerFrameworkPluginVersion_Minor = 0;
-constexpr int TygerFrameworkPluginVersion_Patch = 0;
+constexpr int TygerFrameworkPluginVersion_Patch = 1;
 
 typedef struct {
 	int Major;

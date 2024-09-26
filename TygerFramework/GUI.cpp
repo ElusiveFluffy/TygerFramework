@@ -201,14 +201,21 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		//Only run when the GUI is shown (so it doesn't unfocus the imgui window when its hidden)
 		//Don't run set cursor with the ImGui WndProc as it glitches the resize cursor on the TygerFramework window and every plugin window except the last one it gets ran on 
 		//(Blocking WM_SETCURSOR has a bug though if you quickly move the cursor across the edge of the game window it'll get stuck with the resize cursor, until another cursor change happens)
-		if (GUI::DrawGUI && msg != WM_SETCURSOR)
+		if (msg != WM_SETCURSOR)
 		{
-			//Run the WndProcs both here so they will get run, so 1 doesn't not get run because of "minimal evaluation" of the or in the if
-			LRESULT WndProcResult = ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
-			//Plugin WndProc for if the plugin wants to block any WndProc from the game
-			bool pluginWndProcResult = APIHandler::Get()->PluginWndProc(hWnd, msg, wParam, lParam);
-			//Stop the game from registering mouse movement for the camera when the GUI is open
-			if (WndProcResult || pluginWndProcResult || msg == WM_INPUT)
+			if (GUI::DrawGUI)
+			{
+				//Run the WndProcs both here so they will get run, so 1 doesn't not get run because of "minimal evaluation" of the or in the if
+				LRESULT WndProcResult = ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
+				//Plugin WndProc for if the plugin wants to block any WndProc from the game
+				bool pluginWndProcResult = APIHandler::Get()->PluginWndProc(hWnd, msg, wParam, lParam);
+				//Stop the game from registering mouse movement for the camera when the GUI is open
+				if (WndProcResult || pluginWndProcResult || msg == WM_INPUT)
+					return true;
+			}
+			//Allow WndProc events to still be sent for plugins even when the UI is hidden
+			//Plugins need to handle checking if the UI is hidden
+			else if (APIHandler::Get()->PluginWndProc(hWnd, msg, wParam, lParam))
 				return true;
 		}
 	}
