@@ -4,7 +4,7 @@
 #include "TygerFrameworkAPI.hpp"
 
 bool TygerFrameworkDrawPluginUi(std::string pluginName, DrawUIFunc func);
-bool TygerFrameworkPluginImguiHasFocus(std::string pluginName, ImGuiHasFocusFunc func);
+bool TygerFrameworkPluginImguiWantCaptureMouse(std::string pluginName, ImGuiWantCaptureMouseFunc func);
 bool TygerFrameworkPluginWndProc(std::string pluginName, WndProcFunc func);
 HWND TygerFrameworkGetTyWindowHandle();
 bool TygerFrameworkDrawingGUI();
@@ -20,10 +20,10 @@ public:
 	void DrawUI();
 	void PluginDrawInTygerFrameworkWindow();
 	std::map<std::string, std::vector<TygerFrameworkImGuiParam>> PluginImGuiElements{};
+	std::map<std::string, std::string> mPluginWarnings{};
 
 private:
 	std::map<std::string, HMODULE> mPlugins{};
 	std::map<std::string, std::string> mPluginErrors{};
-	std::map<std::string, std::string> mPluginWarnings{};
 };
 

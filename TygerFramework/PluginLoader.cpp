@@ -23,7 +23,7 @@ TygerFrameworkPluginFunctions pluginFunctions{
     tygerFramework::LogPluginMessage,
     tygerFramework::CurrentTyGame,
     TygerFrameworkDrawPluginUi,
-    TygerFrameworkPluginImguiHasFocus,
+    TygerFrameworkPluginImguiWantCaptureMouse,
     TygerFrameworkPluginWndProc,
     TygerFrameworkGetTyWindowHandle,
     TygerFrameworkDrawingGUI,
@@ -317,12 +317,12 @@ void TygerFrameworkSetImGuiFont(void* imguiFont)
     fonts->Build();
 }
 
-bool TygerFrameworkPluginImguiHasFocus(std::string pluginName, ImGuiHasFocusFunc func)
+bool TygerFrameworkPluginImguiWantCaptureMouse(std::string pluginName, ImGuiWantCaptureMouseFunc func)
 {
     if (func == nullptr)
         return false;
 
-    return APIHandler::Get()->AddPluginImGuiHasFocusFunc({pluginName, func});
+    return APIHandler::Get()->AddPluginImGuiWantCaptureMouseFunc({pluginName, func});
 }
 
 //Plugin draw function subscriber

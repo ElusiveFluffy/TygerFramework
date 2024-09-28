@@ -155,7 +155,7 @@ void GUI::Draw() {
 		APIHandler::Get()->DrawPluginUI();
 
 		//Check if any imgui windows are focused for the mouse click hook
-		GUI::ImGuiWindowFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow) || APIHandler::Get()->PluginImGuiHasFocus();
+		GUI::ImGuiWindowFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow) || APIHandler::Get()->PluginImGuiWantCaptureMouse();
 		//Set the window size once, just to update it to make sure its not too small
 		//when using the saved size and cutting off options when there is more options added
 		ImGui::SetNextWindowSize(ImVec2(285, 240), ImGuiCond_::ImGuiCond_Once);
@@ -199,10 +199,6 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		}
 
 		//Only run when the GUI is shown (so it doesn't unfocus the imgui window when its hidden)
-		//Don't run set cursor with the ImGui WndProc as it glitches the resize cursor on the TygerFramework window and every plugin window except the last one it gets ran on 
-		//(Blocking WM_SETCURSOR has a bug though if you quickly move the cursor across the edge of the game window it'll get stuck with the resize cursor, until another cursor change happens)
-		if (msg != WM_SETCURSOR)
-		{
 			if (GUI::DrawGUI)
 			{
 				//Run the WndProcs both here so they will get run, so 1 doesn't not get run because of "minimal evaluation" of the or in the if
@@ -218,7 +214,6 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			else if (APIHandler::Get()->PluginWndProc(hWnd, msg, wParam, lParam))
 				return true;
 		}
-	}
 
 	//Skip ImGui's win proc if not initialized or isn't a ImGui one
 	return CallWindowProcA(Original_Wndproc, hWnd, msg, wParam, lParam);

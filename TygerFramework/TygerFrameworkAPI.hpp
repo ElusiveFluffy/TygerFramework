@@ -89,8 +89,8 @@ public:
 		return Get()->param()->functions->AddDrawPluginUI(PluginName, func);
 	}
 
-	static bool AddPluginImGuiHasFocus(ImGuiHasFocusFunc func) {
-		return Get()->param()->functions->AddPluginImGuiHasFocus(PluginName, func);
+	static bool AddPluginImGuiWantCaptureMouse(ImGuiWantCaptureMouseFunc func) {
+		return Get()->param()->functions->AddPluginImGuiWantCaptureMouse(PluginName, func);
 	}
 
 	static bool AddPluginWndProc(WndProcFunc func) {

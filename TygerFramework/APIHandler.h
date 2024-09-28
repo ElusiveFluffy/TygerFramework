@@ -3,6 +3,7 @@
 #include <functional>
 #include <string>
 #include <memory>
+#include <map>
 
 class APIHandler
 {
@@ -22,8 +23,8 @@ public:
 		std::string PluginName;
 		std::function<bool()> Function;
 	}PluginImGuiHasFocusParam;
-	bool PluginImGuiHasFocus();
-	bool AddPluginImGuiHasFocusFunc(PluginImGuiHasFocusParam param);
+	bool PluginImGuiWantCaptureMouse();
+	bool AddPluginImGuiWantCaptureMouseFunc(PluginImGuiHasFocusParam param);
 
 	//Plugin WndProc
 	using TyFPluginWndProc = std::function<bool(HWND, UINT, WPARAM, LPARAM)>;
@@ -44,7 +45,7 @@ public:
 private:
 	//Stored Functions
 	std::vector<DrawPluginUIParam> mDrawPluginUIParams{};
-	std::vector<PluginImGuiHasFocusParam> mPluginImGuiHasFocusParams{};
+	std::map<std::string, std::function<bool()>> mPluginImGuiWantCaptureMouseParams{};
 	std::vector<PluginWndProcParam> mPluginWndProcParams{};
 	std::vector<TickBeforeGameParam> mTickBeforeGameParams{};
 };

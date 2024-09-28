@@ -41,12 +41,12 @@ typedef struct {
 }TygerFrameworkImGuiParam;
 
 typedef void (*DrawUIFunc)();
-typedef bool (*ImGuiHasFocusFunc)();
+typedef bool (*ImGuiWantCaptureMouseFunc)();
 typedef bool (*WndProcFunc)(HWND, UINT, WPARAM, LPARAM);
 typedef void (*TickBeforeGameFunc)(float);
 
 typedef bool (*TyFDrawPluginUI)(std::string, DrawUIFunc);
-typedef bool (*TyFPluginImGuiHasFocus)(std::string, ImGuiHasFocusFunc);
+typedef bool (*TyFPluginImGuiWantCaptureMouse)(std::string, ImGuiWantCaptureMouseFunc);
 typedef bool (*TyFPluginWndProc)(std::string, WndProcFunc);
 typedef bool (*TyFTickBeforeGame)(std::string, TickBeforeGameFunc);
 
@@ -54,7 +54,7 @@ typedef struct {
 	void (*LogPluginMessage)(std::string message, LogLevel logLevel);
 	int (*CurrentTyGame)();
 	TyFDrawPluginUI AddDrawPluginUI;
-	TyFPluginImGuiHasFocus AddPluginImGuiHasFocus;
+	TyFPluginImGuiWantCaptureMouse AddPluginImGuiWantCaptureMouse;
 	TyFPluginWndProc AddPluginWndProc;
 	HWND(*GetTyWindowHandle)();
 	bool (*DrawingGUI)(); //Only use for imgui if you have a special use case

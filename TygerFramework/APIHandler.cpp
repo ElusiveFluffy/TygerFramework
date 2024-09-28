@@ -28,25 +28,26 @@ bool APIHandler::AddDrawPluginUIFunc(DrawPluginUIParam param)
 	return true;
 }
 
-bool APIHandler::PluginImGuiHasFocus()
+bool APIHandler::PluginImGuiWantCaptureMouse()
 {
 	bool anyTrue = false;
-	for (auto&& params : mPluginImGuiHasFocusParams) {
+	for (auto&& [pluginName, function] : mPluginImGuiWantCaptureMouseParams) {
 		try {
-			if (params.Function()) {
+			if (function()) {
 				anyTrue = true;
 			}
 		}
 		catch (...) {
-			FrameworkInstance->LogMessage("[API Handler] " + params.PluginName + " had an error occur while checking plugin imgui focus", TygerFramework::Error);
+			FrameworkInstance->LogMessage("[API Handler] " + pluginName + " had an error occur while checking plugin imgui focus", TygerFramework::Error);
 		}
 	}
 	return anyTrue;
 }
 
-bool APIHandler::AddPluginImGuiHasFocusFunc(PluginImGuiHasFocusParam param)
+bool APIHandler::AddPluginImGuiWantCaptureMouseFunc(PluginImGuiHasFocusParam param)
 {
-	mPluginImGuiHasFocusParams.push_back(param);
+	//Replace the old function if its called a second time from the same plugin
+	mPluginImGuiWantCaptureMouseParams.insert_or_assign(param.PluginName, param.Function);
 	return true;
 }
 
@@ -56,9 +57,25 @@ bool APIHandler::PluginWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 	bool anyTrue = false;
 	for (auto&& params : mPluginWndProcParams) {
 		try {
-			if (params.Function(hWnd, msg, wParam, lParam)) {
-				anyTrue = true;
+			bool wantMouseCapture = false;
+			//Check if the plugin wants to capture the mouse
+			if (mPluginImGuiWantCaptureMouseParams.contains(params.PluginName))
+				wantMouseCapture = mPluginImGuiWantCaptureMouseParams[params.PluginName]();
+			else
+			{
+				//Add a warning if it doesn't have the function
+				if (!FrameworkInstance->PluginLoader.mPluginWarnings.contains(params.PluginName))
+				{
+					FrameworkInstance->PluginLoader.mPluginWarnings.emplace(params.PluginName, "No ImGui WantMouseCapture API funciton");
+					FrameworkInstance->LogMessage("[API Handler] " + params.PluginName + " doesn't impliment the imgui WantMouseCapture API function", TygerFramework::Warning);
+				}
 			}
+			//Use if the plugin wants to capture the mouse here to fix a bug with the resizing cursor change
+			//Don't want to run set cursor with the ImGui WndProc as it glitches the resize cursor on the TygerFramework window and every plugin window except the last one it gets ran on
+			if (wantMouseCapture || msg != WM_SETCURSOR)
+				if (params.Function(hWnd, msg, wParam, lParam)) {
+					anyTrue = true;
+				}
 		}
 		catch (...) {
 			FrameworkInstance->LogMessage("[API Handler] " + params.PluginName + " had an error occur when running plugin WndProc", TygerFramework::Error);
