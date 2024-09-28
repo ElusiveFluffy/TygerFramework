@@ -82,7 +82,7 @@ catch (...) {
 void PluginLoader::Initialize() {
 
     //Set Tygerframework module
-    pluginInitParam.tygerFrameworkModule = FrameworkInstance->getFrameworkModule();
+    pluginInitParam.TyHModule = FrameworkInstance->getFrameworkModule();
 
     for (auto plugins = mPlugins.begin(); plugins != mPlugins.end();) {
         std::string pluginName = plugins->first;

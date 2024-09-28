@@ -14,9 +14,9 @@ public:
 
 	PluginLoader PluginLoader{};
 	static std::filesystem::path GetPluginDir();
-	auto getFrameworkModule() const { return mTygerFrameworkModule; };
+	auto getFrameworkModule() const { return mTyHModule; };
 	int CurrentTyGame() const { return TyGame; };
-	TygerFramework(HMODULE tygerFrameworkModule);
+	TygerFramework(HMODULE TyHModule);
 	void LogMessage(std::string message, LogLevel errorType = Info);
 	void Shutdown();
 
@@ -31,7 +31,7 @@ public:
 	HWND TyWindowHandle;
 
 private:
-	HMODULE mTygerFrameworkModule;
+	HMODULE mTyHModule;
 	std::ofstream mLogger;
 
 	int TyGame;

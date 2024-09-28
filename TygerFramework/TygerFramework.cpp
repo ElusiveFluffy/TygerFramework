@@ -25,8 +25,8 @@ void TygerFramework::ToggleConsoleVisibility() {
         ShowWindow(GetConsoleWindow(), SW_SHOW);
 }
 
-TygerFramework::TygerFramework(HMODULE tygerFrameworkModule)
-    : mTygerFrameworkModule{tygerFrameworkModule}
+TygerFramework::TygerFramework(HMODULE TyHModule)
+    : mTyHModule{ TyHModule }
 {
     mLogger.open("TygerFrameworkLog.txt");
     CreateConsole();

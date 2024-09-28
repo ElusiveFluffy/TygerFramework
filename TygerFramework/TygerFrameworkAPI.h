@@ -64,7 +64,7 @@ typedef struct {
 }TygerFrameworkPluginFunctions;
 
 typedef struct {
-	void* tygerFrameworkModule;
+	void* TyHModule;
 	std::string pluginFileName;
 	const TygerFrameworkPluginFunctions* functions;
 	std::string initErrorMessage; //Error message that gets read by TygerFramework if the plugin can't initialize (returning false on initialize)
