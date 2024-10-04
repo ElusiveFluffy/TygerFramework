@@ -239,7 +239,11 @@ void PluginSetTygerFrameworkImGuiElements(std::string pluginName, std::vector<Ty
 void PluginLoader::PluginDrawInTygerFrameworkWindow()
 {
     for (auto&& [pluginName, elements] : PluginImGuiElements) {
+        bool headerCollapsed = false;
         for (TygerFrameworkImGuiParam param : elements) {
+            //Allows for multiple collapsing headers
+            if (headerCollapsed && param.ImGuiElement != CollapsingHeader)
+                continue;
             switch (param.ImGuiElement) {
             case CollapsingHeader:
                 //Return it if the text is blank
@@ -248,9 +252,8 @@ void PluginLoader::PluginDrawInTygerFrameworkWindow()
                     return;
                 }
 
-                //Return out if its closed
-                if (!ImGui::CollapsingHeader(param.Text.c_str()))
-                    return;
+                //Check if its closed
+                headerCollapsed = !ImGui::CollapsingHeader(param.Text.c_str());
                 break;
             case Text:
                 ImGui::Text(param.Text.c_str());
