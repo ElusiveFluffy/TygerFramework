@@ -85,7 +85,7 @@ public:
 	//Event subscriber functions
 	//--------------------------
 
-	static bool AddDrawPluginUI(DrawUIFunc func) {
+	static bool AddDrawPluginUI(VoidFunc func) {
 		return Get()->param()->functions->AddDrawPluginUI(PluginName, func);
 	}
 
@@ -99,6 +99,10 @@ public:
 
 	static bool AddTickBeforeGame(TickBeforeGameFunc func) {
 		return Get()->param()->functions->AddTickBeforeGame(PluginName, func);
+	}
+
+	static bool AddOnTyInitialize(VoidFunc func) {
+		return Get()->param()->functions->AddOnTyInitialized(PluginName, func);
 	}
 
 private:

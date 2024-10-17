@@ -55,6 +55,12 @@ EXTERN_C DWORD WINAPI xinput_get_state(DWORD dwUserIndex, XINPUT_STATE* pState) 
 
 void startupThread(HMODULE tygerFrameworkModule) {
     FrameworkInstance->PluginLoader.Initialize();
+    //Start checking if the game has initialized. 
+    //Do it after all the plugins have initialized so then if initialization took long for the plugins and the game is already 
+    //initialized then don't need extra logic to run the API function
+    //Also makes it so another thread isn't needed
+    if (FrameworkInstance->CurrentTyGame() != 0)
+        FrameworkInstance->CheckIfGameFinishInit();
 }
 
 BOOL APIENTRY DllMain(HANDLE handle, DWORD reason, LPVOID reserved) {

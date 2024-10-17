@@ -42,10 +42,19 @@ public:
 	}TickBeforeGameParam;
 	void TickBeforeGame(float deltaSeconds);
 	void AddTickBeforeGameFunc(TickBeforeGameParam param);
+
+	//On Ty Initialized
+	typedef struct {
+		std::string PluginName;
+		std::function<void()> Function;
+	}OnTyInitializedParam;
+	void OnTyInitialized();
+	void AddOnTyInitializedFunc(OnTyInitializedParam param);
 private:
 	//Stored Functions
 	std::vector<DrawPluginUIParam> mDrawPluginUIParams{};
 	std::map<std::string, std::function<bool()>> mPluginImGuiWantCaptureMouseParams{};
 	std::vector<PluginWndProcParam> mPluginWndProcParams{};
 	std::vector<TickBeforeGameParam> mTickBeforeGameParams{};
+	std::vector<OnTyInitializedParam> mOnTyInitializedParams{};
 };

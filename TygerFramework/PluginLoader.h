@@ -3,7 +3,7 @@
 #include <string>
 #include "TygerFrameworkAPI.hpp"
 
-bool TygerFrameworkDrawPluginUi(std::string pluginName, DrawUIFunc func);
+bool TygerFrameworkDrawPluginUi(std::string pluginName, VoidFunc func);
 bool TygerFrameworkPluginImguiWantCaptureMouse(std::string pluginName, ImGuiWantCaptureMouseFunc func);
 bool TygerFrameworkPluginWndProc(std::string pluginName, WndProcFunc func);
 HWND TygerFrameworkGetTyWindowHandle();
@@ -11,6 +11,7 @@ bool TygerFrameworkDrawingGUI();
 void TygerFrameworkSetImGuiFont(void* fonts);
 void PluginSetTygerFrameworkImGuiElements(std::string pluginName, std::vector<TygerFrameworkImGuiParam> param);
 bool TygerFrameworkTickBeforeGame(std::string pluginName, TickBeforeGameFunc func);
+bool TygerFrameworkOnTyInitialized(std::string pluginName, VoidFunc func);
 
 class PluginLoader
 {

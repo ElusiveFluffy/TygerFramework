@@ -22,6 +22,9 @@ public:
 
 	void ToggleConsoleVisibility();
 
+	void CheckIfGameFinishInit();
+	bool TyHasInitialized;
+
 	//UI Settings
 	bool ShowConsole;
 	bool TyLogInConsole;

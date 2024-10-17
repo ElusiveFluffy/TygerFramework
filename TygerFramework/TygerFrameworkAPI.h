@@ -3,8 +3,8 @@
 #include <vector>
 
 constexpr int TygerFrameworkPluginVersion_Major = 1;
-constexpr int TygerFrameworkPluginVersion_Minor = 0;
-constexpr int TygerFrameworkPluginVersion_Patch = 1;
+constexpr int TygerFrameworkPluginVersion_Minor = 1;
+constexpr int TygerFrameworkPluginVersion_Patch = 0;
 
 typedef struct {
 	int Major;
@@ -40,12 +40,12 @@ typedef struct {
 	std::string Text;
 }TygerFrameworkImGuiParam;
 
-typedef void (*DrawUIFunc)();
+typedef void (*VoidFunc)();
 typedef bool (*ImGuiWantCaptureMouseFunc)();
 typedef bool (*WndProcFunc)(HWND, UINT, WPARAM, LPARAM);
 typedef void (*TickBeforeGameFunc)(float);
 
-typedef bool (*TyFDrawPluginUI)(std::string, DrawUIFunc);
+typedef bool (*TyFDrawPluginUI)(std::string, VoidFunc);
 typedef bool (*TyFPluginImGuiWantCaptureMouse)(std::string, ImGuiWantCaptureMouseFunc);
 typedef bool (*TyFPluginWndProc)(std::string, WndProcFunc);
 typedef bool (*TyFTickBeforeGame)(std::string, TickBeforeGameFunc);
@@ -61,6 +61,7 @@ typedef struct {
 	void (*SetImGuiFont)(void* imguiFont);
 	void (*SetTyFImGuiElements)(std::string pluginName, std::vector<TygerFrameworkImGuiParam> params);
 	TyFTickBeforeGame AddTickBeforeGame;
+	bool (*AddOnTyInitialized)(std::string, VoidFunc);
 }TygerFrameworkPluginFunctions;
 
 typedef struct {

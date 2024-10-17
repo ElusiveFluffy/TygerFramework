@@ -107,3 +107,21 @@ void APIHandler::AddTickBeforeGameFunc(TickBeforeGameParam param)
 {
 	mTickBeforeGameParams.push_back(param);
 }
+
+void APIHandler::OnTyInitialized()
+{
+	for (auto&& params : mOnTyInitializedParams) {
+		try {
+			params.Function();
+		}
+		catch (...) {
+			FrameworkInstance->LogMessage("[API Handler] Had an error occur when notifying " + params.PluginName + " that Ty had initialized", TygerFramework::Error);
+		}
+	}
+
+}
+
+void APIHandler::AddOnTyInitializedFunc(OnTyInitializedParam param)
+{
+	mOnTyInitializedParams.push_back(param);
+}

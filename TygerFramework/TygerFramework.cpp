@@ -6,6 +6,8 @@
 #include "MinHook.h"
 #include "OpenGLHook.h"
 #include "GUI.h"
+#include "TyMemoryValues.h"
+#include "APIHandler.h"
 #include "ini.h"
 namespace fs = std::filesystem;
 
@@ -32,6 +34,13 @@ TygerFramework::TygerFramework(HMODULE TyHModule)
     CreateConsole();
     LogMessage("[TygerFramework] Logger Started");
     LoadSettings();
+
+    if (mTyHModule) {
+        TyMemoryValues::TyBaseAddress = (DWORD)mTyHModule;
+        LogMessage("[TygerFramework] Got Ty Base Address");
+    }
+    else
+        LogMessage("[TygerFramework] Couldn't get Ty base address", Error);
 
     if (fs::exists("steam_appid.txt"))
     {
@@ -248,4 +257,15 @@ void TygerFramework::LogMessage(std::string message, LogLevel logLevel) {
         
         outfile.close();
     }
+}
+
+void TygerFramework::CheckIfGameFinishInit() {
+    if (!TyMemoryValues::TyBaseAddress)
+        return;
+    //Just waiting for the game to startup, values below 5 are all uses before fully initialized
+    while (TyMemoryValues::HasGameInitialized()) {
+        Sleep(100);
+    }
+    TyHasInitialized = true;
+    APIHandler::Get()->OnTyInitialized();
 }

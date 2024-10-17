@@ -29,7 +29,8 @@ TygerFrameworkPluginFunctions pluginFunctions{
     TygerFrameworkDrawingGUI,
     TygerFrameworkSetImGuiFont,
     PluginSetTygerFrameworkImGuiElements,
-    TygerFrameworkTickBeforeGame
+    TygerFrameworkTickBeforeGame,
+    TygerFrameworkOnTyInitialized
 };
 
 TygerFrameworkPluginInitializeParam pluginInitParam{
@@ -329,7 +330,7 @@ bool TygerFrameworkPluginImguiWantCaptureMouse(std::string pluginName, ImGuiWant
 }
 
 //Plugin draw function subscriber
-bool TygerFrameworkDrawPluginUi(std::string pluginName, DrawUIFunc func)
+bool TygerFrameworkDrawPluginUi(std::string pluginName, VoidFunc func)
 {
     if (func == nullptr)
         return false;
@@ -352,5 +353,14 @@ bool TygerFrameworkTickBeforeGame(std::string pluginName, TickBeforeGameFunc fun
         return false;
 
     APIHandler::Get()->AddTickBeforeGameFunc({pluginName, func});
+    return true;
+}
+
+bool TygerFrameworkOnTyInitialized(std::string pluginName, VoidFunc func)
+{
+    if (func == nullptr)
+        return false;
+
+    APIHandler::Get()->AddOnTyInitializedFunc({ pluginName, func });
     return true;
 }
