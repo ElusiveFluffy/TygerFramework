@@ -11,7 +11,7 @@ bool TyMemoryValues::HasGameInitialized()
 	case 2:
 	case 3:
 		//Ty 2 and 3 is initialized once the window shows and the GUI only initialized once the window is shown
-		return GUI::Initialized;
+		return !GUI::Initialized;
 	default:
 		return false;
 	}
