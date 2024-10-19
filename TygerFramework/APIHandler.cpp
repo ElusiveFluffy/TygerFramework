@@ -22,7 +22,7 @@ void APIHandler::DrawPluginUI()
 }
 
 //Subscribe plugin functions to the Draw UI loop
-bool APIHandler::AddDrawPluginUIFunc(DrawPluginUIParam param)
+bool APIHandler::AddDrawPluginUIFunc(VoidFunctionParam param)
 {
 	mDrawPluginUIParams.push_back(param);
 	return true;
@@ -44,7 +44,7 @@ bool APIHandler::PluginImGuiWantCaptureMouse()
 	return anyTrue;
 }
 
-bool APIHandler::AddPluginImGuiWantCaptureMouseFunc(PluginImGuiHasFocusParam param)
+bool APIHandler::AddPluginImGuiWantCaptureMouseFunc(PluginWantCaptureMouseParam param)
 {
 	//Replace the old function if its called a second time from the same plugin
 	mPluginImGuiWantCaptureMouseParams.insert_or_assign(param.PluginName, param.Function);
@@ -120,7 +120,7 @@ void APIHandler::OnTyInitialized()
 	}
 }
 
-void APIHandler::AddOnTyInitializedFunc(OnTyInitializedParam param)
+void APIHandler::AddOnTyInitializedFunc(VoidFunctionParam param)
 {
 	mOnTyInitializedParams.push_back(param);
 }
@@ -137,7 +137,7 @@ void APIHandler::OnTyBeginShutdown()
 	}
 }
 
-void APIHandler::AddOnTyBeginShutdownFunc(OnTyBeginShutdownParam param)
+void APIHandler::AddOnTyBeginShutdownFunc(VoidFunctionParam param)
 {
 	mOnTyBeginShutdownParams.push_back(param);
 }
