@@ -47,6 +47,7 @@ private:
 	void LoadSettings();
 
 	bool HookTyDebugOutput();
+	bool HookTyShutdown();
 };
 
 extern std::unique_ptr<TygerFramework> FrameworkInstance;

@@ -50,6 +50,14 @@ public:
 	}OnTyInitializedParam;
 	void OnTyInitialized();
 	void AddOnTyInitializedFunc(OnTyInitializedParam param);
+
+	//On Ty Begin Shutdown
+	typedef struct {
+		std::string PluginName;
+		std::function<void()> Function;
+	}OnTyBeginShutdownParam;
+	void OnTyBeginShutdown();
+	void AddOnTyBeginShutdownFunc(OnTyBeginShutdownParam param);
 private:
 	//Stored Functions
 	std::vector<DrawPluginUIParam> mDrawPluginUIParams{};
@@ -57,4 +65,5 @@ private:
 	std::vector<PluginWndProcParam> mPluginWndProcParams{};
 	std::vector<TickBeforeGameParam> mTickBeforeGameParams{};
 	std::vector<OnTyInitializedParam> mOnTyInitializedParams{};
+	std::vector<OnTyBeginShutdownParam> mOnTyBeginShutdownParams{};
 };

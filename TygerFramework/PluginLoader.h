@@ -12,6 +12,7 @@ void TygerFrameworkSetImGuiFont(void* fonts);
 void PluginSetTygerFrameworkImGuiElements(std::string pluginName, std::vector<TygerFrameworkImGuiParam> param);
 bool TygerFrameworkTickBeforeGame(std::string pluginName, TickBeforeGameFunc func);
 bool TygerFrameworkOnTyInitialized(std::string pluginName, VoidFunc func);
+bool TygerFrameworkOnTyBeginShutdown(std::string pluginName, VoidFunc func);
 
 class PluginLoader
 {

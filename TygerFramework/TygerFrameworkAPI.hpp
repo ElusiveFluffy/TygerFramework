@@ -105,6 +105,10 @@ public:
 		return Get()->param()->functions->AddOnTyInitialized(PluginName, func);
 	}
 
+	static bool AddOnTyBeginShutdown(VoidFunc func) {
+		return Get()->param()->functions->AddOnTyBeginShutdown(PluginName, func);
+	}
+
 private:
 	static inline std::unique_ptr<API> mInstance;
 	const TygerFrameworkPluginInitializeParam* mParam;

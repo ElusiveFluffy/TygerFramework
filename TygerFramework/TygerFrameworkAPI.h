@@ -62,6 +62,7 @@ typedef struct {
 	void (*SetTyFImGuiElements)(std::string pluginName, std::vector<TygerFrameworkImGuiParam> params);
 	TyFTickBeforeGame AddTickBeforeGame;
 	bool (*AddOnTyInitialized)(std::string, VoidFunc);
+	bool (*AddOnTyBeginShutdown)(std::string, VoidFunc);
 }TygerFrameworkPluginFunctions;
 
 typedef struct {

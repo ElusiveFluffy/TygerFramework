@@ -118,10 +118,26 @@ void APIHandler::OnTyInitialized()
 			FrameworkInstance->LogMessage("[API Handler] Had an error occur when notifying " + params.PluginName + " that Ty had initialized", TygerFramework::Error);
 		}
 	}
-
 }
 
 void APIHandler::AddOnTyInitializedFunc(OnTyInitializedParam param)
 {
 	mOnTyInitializedParams.push_back(param);
+}
+
+void APIHandler::OnTyBeginShutdown()
+{
+	for (auto&& params : mOnTyBeginShutdownParams) {
+		try {
+			params.Function();
+		}
+		catch (...) {
+			FrameworkInstance->LogMessage("[API Handler] Had an error occur when notifying " + params.PluginName + " that Ty had begun shutting down", TygerFramework::Error);
+		}
+	}
+}
+
+void APIHandler::AddOnTyBeginShutdownFunc(OnTyBeginShutdownParam param)
+{
+	mOnTyBeginShutdownParams.push_back(param);
 }

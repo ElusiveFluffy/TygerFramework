@@ -16,6 +16,18 @@ std::unique_ptr<TygerFramework> FrameworkInstance;
 typedef void(WINAPI* OutputDebugString_t) (LPCSTR lpOutputString);
 OutputDebugString_t Original_OutputDebugString;
 
+typedef int32_t(WINAPI* TyShutdown_t) ();
+TyShutdown_t Original_TyShutdown;
+
+int32_t WINAPI TyBeginShutdown() {
+    FrameworkInstance->LogMessage("[Ty Shutdown Hook] Ty Began Shutting Down");
+    //Notify all plugins
+    APIHandler::Get()->OnTyBeginShutdown();
+
+    //Run the game's shutdown function
+    return Original_TyShutdown();
+}
+
 std::filesystem::path TygerFramework::GetPluginDir() {
     return fs::current_path() / "Plugins";
 }
@@ -268,4 +280,27 @@ void TygerFramework::CheckIfGameFinishInit() {
     }
     TyHasInitialized = true;
     APIHandler::Get()->OnTyInitialized();
+    HookTyShutdown();
+}
+
+bool TygerFramework::HookTyShutdown()
+{
+    //Hook Ty Shutdown Function
+    MH_STATUS minHookStatus = MH_CreateHook(TyMemoryValues::GetTyShutdownFunc(), &TyBeginShutdown, reinterpret_cast<LPVOID*>(&Original_TyShutdown));
+    if (minHookStatus != MH_OK) {
+        std::string error = MH_StatusToString(minHookStatus);
+        LogMessage("[Ty Shutdown Hook] Failed to Create the Ty Shutdown Function Hook, With the Error: " + error, Error);
+        return false;
+    }
+
+    //Enable both hooks
+    minHookStatus = MH_EnableHook(MH_ALL_HOOKS);
+    if (minHookStatus != MH_OK) {
+        std::string error = MH_StatusToString(minHookStatus);
+        LogMessage("[Ty Shutdown Hook] Failed to Hook Ty Shutdown Function, With the Error: " + error, Error);
+        return false;
+    }
+
+    LogMessage("[Ty Shutdown Hook] Sucessfully Hooked the Ty Shutdown Function");
+    return true;
 }

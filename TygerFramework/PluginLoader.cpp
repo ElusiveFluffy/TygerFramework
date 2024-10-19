@@ -30,7 +30,8 @@ TygerFrameworkPluginFunctions pluginFunctions{
     TygerFrameworkSetImGuiFont,
     PluginSetTygerFrameworkImGuiElements,
     TygerFrameworkTickBeforeGame,
-    TygerFrameworkOnTyInitialized
+    TygerFrameworkOnTyInitialized,
+    TygerFrameworkOnTyBeginShutdown
 };
 
 TygerFrameworkPluginInitializeParam pluginInitParam{
@@ -362,5 +363,14 @@ bool TygerFrameworkOnTyInitialized(std::string pluginName, VoidFunc func)
         return false;
 
     APIHandler::Get()->AddOnTyInitializedFunc({ pluginName, func });
+    return true;
+}
+
+bool TygerFrameworkOnTyBeginShutdown(std::string pluginName, VoidFunc func)
+{
+    if (func == nullptr)
+        return false;
+
+    APIHandler::Get()->AddOnTyBeginShutdownFunc({ pluginName, func });
     return true;
 }
