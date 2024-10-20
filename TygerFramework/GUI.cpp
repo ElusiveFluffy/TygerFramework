@@ -29,33 +29,35 @@ BOOL WINAPI SetCursorPosHook(int X, int Y) {
 }
 
 BOOL WINAPI GetKeyboardStateHook(PBYTE lpKeyState) {
-	//Disable left clicking if GUI is open, and focused or not allowing input passthrough
-	if (GUI::DrawGUI && (GUI::ImGuiWindowFocused || !FrameworkInstance->InputPassthrough)) {
-		BOOL returnVal = 1;
-		if (!FrameworkInstance->KeyboardAlwaysPassthrough)
-		{
-			//Clears the entire keyboard and mouse state buffer (the buffer is always 256 bytes long)
-			//For a full clear the original function doesn't need to be run
-			//If not running the original function need to clear the memory here otherwise there is 
-			//just a bunch of garbage data at the pointer that the game will try to read as inputs
-			memset(lpKeyState, 0, 256);
-		}
-		else
-		{
-			//Get the current key state for everything else
-			returnVal = Original_GetKeyboardState(lpKeyState);
-			if (returnVal != 0) {
-				//Disable the mouse buttons
-				lpKeyState[VK_LBUTTON] = 0;
-				lpKeyState[VK_MBUTTON] = 0;
-				lpKeyState[VK_RBUTTON] = 0;
-			}
 
+	BOOL returnVal = Original_GetKeyboardState(lpKeyState);
+	BYTE LMouseState = lpKeyState[VK_LBUTTON];
+	BYTE MMouseState = lpKeyState[VK_MBUTTON];
+	BYTE RMouseState = lpKeyState[VK_RBUTTON];
+
+	//Block keyboard input (covers mouse too if its blocked)
+	if (FrameworkInstance->PluginLoader.TyInputCombinedFlags & NoKeyboardInput) {
+		//Clears the entire keyboard and mouse state buffer (the buffer is always 256 bytes long)
+		//For a full clear the original function doesn't need to be run
+		//If not running the original function need to clear the memory here otherwise there is 
+		//just a bunch of garbage data at the pointer that the game will try to read as inputs
+		memset(lpKeyState, 0, 256);
+
+		//Restore the mouse inputs if not blocking the mouse
+		if (!(FrameworkInstance->PluginLoader.TyInputCombinedFlags & NoMouseInput))
+		{
+			lpKeyState[VK_LBUTTON] = LMouseState;
+			lpKeyState[VK_MBUTTON] = MMouseState;
+			lpKeyState[VK_RBUTTON] = RMouseState;
 		}
-		return returnVal;
 	}
-
-	return Original_GetKeyboardState(lpKeyState);
+	//Block only mouse input
+	else if (FrameworkInstance->PluginLoader.TyInputCombinedFlags & NoMouseInput) {
+		lpKeyState[VK_LBUTTON] = 0;
+		lpKeyState[VK_MBUTTON] = 0;
+		lpKeyState[VK_RBUTTON] = 0;
+	}
+	return returnVal;
 }
 
 bool HookInput() {
@@ -162,13 +164,16 @@ void GUI::Draw() {
 	else
 		APIHandler::Get()->TickBeforeGame(1.0f / LastFrameFPS);
 
+	//Check if any imgui windows are focused for the mouse click hook
+	//NoMouseInput is 1, and None is 0, so can just cast the bool to avoid a if
+	bool blockMouseInput = APIHandler::Get()->PluginImGuiWantCaptureMouse() || (GUI::DrawGUI && (ImGui::GetIO().WantCaptureMouse || !FrameworkInstance->InputPassthrough));
+	FrameworkInstance->PluginLoader.SetTyBlockedInputs("TygerFramework", (TyBlockedInputsFlags)blockMouseInput);
+
 	//Draw ImGui windows
 	if (GUI::DrawGUI) {
 		//Draw all the plugin windows
 		APIHandler::Get()->DrawPluginUI();
 
-		//Check if any imgui windows are focused for the mouse click hook
-		GUI::ImGuiWindowFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_AnyWindow) || APIHandler::Get()->PluginImGuiWantCaptureMouse();
 		//Set the window size once, just to update it to make sure its not too small
 		//when using the saved size and cutting off options when there is more options added
 		ImGui::SetNextWindowSize(ImVec2(285, 240), ImGuiCond_::ImGuiCond_Once);

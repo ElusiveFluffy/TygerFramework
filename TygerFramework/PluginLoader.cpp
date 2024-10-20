@@ -310,16 +310,10 @@ TyBlockedInputsFlags GetPluginsTyBlockedInputState(std::string pluginName)
     return FrameworkInstance->PluginLoader.GetPluginTyInputFlags()[pluginName];
 }
 
-bool PluginLoader::SetTyBlockedInputs(std::string pluginName, TyBlockedInputsFlags flags)
+//Blocker name is the one who wants to block input, for plugins it'll be the plugin name, but TygerFramework also uses this
+bool PluginLoader::SetTyBlockedInputs(std::string blockerName, TyBlockedInputsFlags flags)
 {
-    if (flags == None) {
-        if (!mPluginTyInputFlags.contains(pluginName))
-            return false;
-        mPluginTyInputFlags.erase(pluginName);
-        CombineTyBlockedInputs();
-        return true;
-    }
-    mPluginTyInputFlags.insert_or_assign(pluginName, flags);
+    mPluginTyInputFlags.insert_or_assign(blockerName, flags);
     CombineTyBlockedInputs();
     return true;
 }

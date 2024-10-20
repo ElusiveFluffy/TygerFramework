@@ -27,7 +27,7 @@ public:
 	std::map<std::string, std::string> mPluginWarnings{};
 
 	std::map<std::string, TyBlockedInputsFlags>& GetPluginTyInputFlags() { return mPluginTyInputFlags; };
-	bool SetTyBlockedInputs(std::string pluginName, TyBlockedInputsFlags flags);
+	bool SetTyBlockedInputs(std::string blockerName, TyBlockedInputsFlags flags);
 	TyBlockedInputsFlags TyInputCombinedFlags = None;
 
 private:
