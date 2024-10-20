@@ -2,6 +2,11 @@
 #include <string>
 #include <vector>
 
+//Needed for the WndProc inputs usually in precompiled headers but that needs to be turned off for imgui
+#define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
+// Windows Header Files
+#include <windows.h>
+
 constexpr int TygerFrameworkPluginVersion_Major = 1;
 constexpr int TygerFrameworkPluginVersion_Minor = 1;
 constexpr int TygerFrameworkPluginVersion_Patch = 0;
