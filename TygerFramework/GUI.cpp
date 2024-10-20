@@ -31,13 +31,26 @@ BOOL WINAPI SetCursorPosHook(int X, int Y) {
 BOOL WINAPI GetKeyboardStateHook(PBYTE lpKeyState) {
 	//Disable left clicking if GUI is open, and focused or not allowing input passthrough
 	if (GUI::DrawGUI && (GUI::ImGuiWindowFocused || !FrameworkInstance->InputPassthrough)) {
-		//Get the current key state for everything else
-		BOOL returnVal = Original_GetKeyboardState(lpKeyState);
-		if (returnVal != 0) {
-			//Disable the mouse buttons
-			lpKeyState[VK_LBUTTON] = 0;
-			lpKeyState[VK_MBUTTON] = 0;
-			lpKeyState[VK_RBUTTON] = 0;
+		BOOL returnVal = 1;
+		if (!FrameworkInstance->KeyboardAlwaysPassthrough)
+		{
+			//Clears the entire keyboard and mouse state buffer (the buffer is always 256 bytes long)
+			//For a full clear the original function doesn't need to be run
+			//If not running the original function need to clear the memory here otherwise there is 
+			//just a bunch of garbage data at the pointer that the game will try to read as inputs
+			memset(lpKeyState, 0, 256);
+		}
+		else
+		{
+			//Get the current key state for everything else
+			returnVal = Original_GetKeyboardState(lpKeyState);
+			if (returnVal != 0) {
+				//Disable the mouse buttons
+				lpKeyState[VK_LBUTTON] = 0;
+				lpKeyState[VK_MBUTTON] = 0;
+				lpKeyState[VK_RBUTTON] = 0;
+			}
+
 		}
 		return returnVal;
 	}
@@ -109,7 +122,7 @@ bool GUI::Init() {
 	ImGuiIO& io = ImGui::GetIO();
 	(void)io;
 	ImGui_ImplWin32_InitForOpenGL(FrameworkInstance->TyWindowHandle);
-    ImGui_ImplOpenGL3_Init();
+	ImGui_ImplOpenGL3_Init();
 
 	//Don't set it to false here or it breaks and never shows the cursor
 	if (GUI::DrawGUI)
@@ -174,13 +187,20 @@ void GUI::Draw() {
 		ImGui::SameLine();
 		ImGui::Text("(?)");
 		if (ImGui::IsItemHovered())
-			ImGui::SetTooltip("Allows the game to register mouse clicks while the menu is open.");
+			ImGui::SetTooltip("Allows the game to register mouse clicks and keyboard input while the menu is open but not focused.");
 
+		ImGui::Checkbox("Keyboard Always Passthrough", &FrameworkInstance->KeyboardAlwaysPassthrough);
+		ImGui::SameLine();
+		ImGui::Text("(?)");
+		if (ImGui::IsItemHovered())
+			ImGui::SetTooltip("Allows the game to register keyboard input even while the menu is focused.");
 		FrameworkInstance->PluginLoader.DrawUI();
 		FrameworkInstance->PluginLoader.PluginDrawInTygerFrameworkWindow();
 
 
 		ImGui::End();
+
+		ImGui::ShowDemoWindow();
 	}
 	//Needs to be called after NewFrame
 	ImGui::Render();
@@ -199,21 +219,21 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		}
 
 		//Only run when the GUI is shown (so it doesn't unfocus the imgui window when its hidden)
-			if (GUI::DrawGUI)
-			{
-				//Run the WndProcs both here so they will get run, so 1 doesn't not get run because of "minimal evaluation" of the or in the if
-				LRESULT WndProcResult = ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
-				//Plugin WndProc for if the plugin wants to block any WndProc from the game
-				bool pluginWndProcResult = APIHandler::Get()->PluginWndProc(hWnd, msg, wParam, lParam);
-				//Stop the game from registering mouse movement for the camera when the GUI is open
-				if (WndProcResult || pluginWndProcResult || msg == WM_INPUT)
-					return true;
-			}
-			//Allow WndProc events to still be sent for plugins even when the UI is hidden
-			//Plugins need to handle checking if the UI is hidden
-			else if (APIHandler::Get()->PluginWndProc(hWnd, msg, wParam, lParam))
+		if (GUI::DrawGUI)
+		{
+			//Run the WndProcs both here so they will get run, so 1 doesn't not get run because of "minimal evaluation" of the or in the if
+			LRESULT WndProcResult = ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
+			//Plugin WndProc for if the plugin wants to block any WndProc from the game
+			bool pluginWndProcResult = APIHandler::Get()->PluginWndProc(hWnd, msg, wParam, lParam);
+			//Stop the game from registering mouse movement for the camera when the GUI is open
+			if (WndProcResult || pluginWndProcResult || msg == WM_INPUT)
 				return true;
 		}
+		//Allow WndProc events to still be sent for plugins even when the UI is hidden
+		//Plugins need to handle checking if the UI is hidden
+		else if (APIHandler::Get()->PluginWndProc(hWnd, msg, wParam, lParam))
+			return true;
+	}
 
 	//Skip ImGui's win proc if not initialized or isn't a ImGui one
 	return CallWindowProcA(Original_Wndproc, hWnd, msg, wParam, lParam);

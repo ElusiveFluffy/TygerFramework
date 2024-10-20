@@ -30,6 +30,7 @@ public:
 	bool TyLogInConsole;
 	bool RememberVisibility = true;
 	bool InputPassthrough = true;
+	bool KeyboardAlwaysPassthrough;
 
 	HWND TyWindowHandle;
 
