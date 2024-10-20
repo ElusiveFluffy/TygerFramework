@@ -40,6 +40,14 @@ enum TyFImGuiElements {
 	TreePop //No text (Make sure to call when done after using TreePush)
 };
 
+//Flags to block Ty from receiving inputs like mouse clicks
+enum TyBlockedInputsFlags {
+	None = 0,
+	NoMouseInput = 1 << 0,
+	NoKeyboardInput = 1 << 1
+};
+DEFINE_ENUM_FLAG_OPERATORS(TyBlockedInputsFlags)
+
 typedef struct {
 	TyFImGuiElements ImGuiElement;
 	std::string Text;
@@ -55,6 +63,7 @@ typedef bool (*TyFPluginImGuiWantCaptureMouse)(std::string, ImGuiWantCaptureMous
 typedef bool (*TyFPluginWndProc)(std::string, WndProcFunc);
 typedef bool (*TyFTickBeforeGame)(std::string, TickBeforeGameFunc);
 
+//Order of these matters to be backwards compatible
 typedef struct {
 	void (*LogPluginMessage)(std::string message, LogLevel logLevel);
 	int (*CurrentTyGame)();
@@ -68,8 +77,11 @@ typedef struct {
 	TyFTickBeforeGame AddTickBeforeGame;
 	bool (*AddOnTyInitialized)(std::string, VoidFunc);
 	bool (*AddOnTyBeginShutdown)(std::string, VoidFunc);
+	bool (*SetTyBlockedInputs)(std::string pluginName, TyBlockedInputsFlags flags);
+	TyBlockedInputsFlags (*GetTyBlockedInputState)(std::string pluginName);
 }TygerFrameworkPluginFunctions;
 
+//Order of these matters to be backwards compatible
 typedef struct {
 	void* TyHModule;
 	std::string pluginFileName;

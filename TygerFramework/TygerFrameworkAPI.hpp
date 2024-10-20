@@ -81,6 +81,15 @@ public:
 		Get()->param()->functions->SetTyFImGuiElements(PluginName, elements);
 	}
 
+	static bool SetTyBlockedInputs(TyBlockedInputsFlags flags) {
+		return Get()->param()->functions->SetTyBlockedInputs(PluginName, flags);
+	}
+
+	//Get the input state of the game set by this plugin (the plugin state could still be blocked by another plugin though)
+	static TyBlockedInputsFlags GetTyBlockedInputState() {
+		return Get()->param()->functions->GetTyBlockedInputState(PluginName);
+	}
+
 	//--------------------------
 	//Event subscriber functions
 	//--------------------------

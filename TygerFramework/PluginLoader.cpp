@@ -31,7 +31,9 @@ TygerFrameworkPluginFunctions pluginFunctions{
     PluginSetTygerFrameworkImGuiElements,
     TygerFrameworkTickBeforeGame,
     TygerFrameworkOnTyInitialized,
-    TygerFrameworkOnTyBeginShutdown
+    TygerFrameworkOnTyBeginShutdown,
+    PluginSetTyBlockedInputProxy,
+    GetPluginsTyBlockedInputState
 };
 
 TygerFrameworkPluginInitializeParam pluginInitParam{
@@ -296,6 +298,39 @@ void PluginLoader::PluginDrawInTygerFrameworkWindow()
                 break;
             }
         }
+    }
+}
+
+bool PluginSetTyBlockedInputProxy(std::string pluginName, TyBlockedInputsFlags flags) {
+    return FrameworkInstance->PluginLoader.SetTyBlockedInputs(pluginName, flags);
+}
+
+TyBlockedInputsFlags GetPluginsTyBlockedInputState(std::string pluginName)
+{
+    return FrameworkInstance->PluginLoader.GetPluginTyInputFlags()[pluginName];
+}
+
+bool PluginLoader::SetTyBlockedInputs(std::string pluginName, TyBlockedInputsFlags flags)
+{
+    if (flags == None) {
+        if (!mPluginTyInputFlags.contains(pluginName))
+            return false;
+        mPluginTyInputFlags.erase(pluginName);
+        CombineTyBlockedInputs();
+        return true;
+    }
+    mPluginTyInputFlags.insert_or_assign(pluginName, flags);
+    CombineTyBlockedInputs();
+    return true;
+}
+
+void PluginLoader::CombineTyBlockedInputs()
+{
+    //Reset the flags first
+    TyInputCombinedFlags = None;
+    //Combine all the flags
+    for (auto&& [_, flag] : mPluginTyInputFlags) {
+        TyInputCombinedFlags |= flag;
     }
 }
 
