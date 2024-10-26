@@ -11,7 +11,7 @@ If you want to build TygerFramework from source you just need to install MinHook
 After getting vcpkg all set up to work with visual studio just enter this command for it to install Minhook
 
 ```
-vcpkg install minhook --triplet x86-windows-static
+vcpkg install minhook --triplet x86-windows-static-md
 ```
 
 You'll probably also need to edit the post build command to your Ty directory (if its not on the D drive), after that you should be able to build the project.
