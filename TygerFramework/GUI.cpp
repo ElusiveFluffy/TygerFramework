@@ -36,7 +36,7 @@ BOOL WINAPI GetKeyboardStateHook(PBYTE lpKeyState) {
 	BYTE RMouseState = lpKeyState[VK_RBUTTON];
 
 	//Block keyboard input (covers mouse too if its blocked)
-	if (FrameworkInstance->PluginLoader.TyInputCombinedFlags & NoKeyboardInput) {
+	if (FrameworkInstance->PluginLoader.TyInputCombinedFlags & NoKeyboardInput && !FrameworkInstance->KeyboardAlwaysPassthrough) {
 		//Clears the entire keyboard and mouse state buffer (the buffer is always 256 bytes long)
 		//For a full clear the original function doesn't need to be run
 		//If not running the original function need to clear the memory here otherwise there is 
@@ -44,7 +44,7 @@ BOOL WINAPI GetKeyboardStateHook(PBYTE lpKeyState) {
 		memset(lpKeyState, 0, 256);
 
 		//Restore the mouse inputs if not blocking the mouse
-		if (!(FrameworkInstance->PluginLoader.TyInputCombinedFlags & NoMouseInput))
+		if (!(FrameworkInstance->PluginLoader.TyInputCombinedFlags & NoMouseClickInput))
 		{
 			lpKeyState[VK_LBUTTON] = LMouseState;
 			lpKeyState[VK_MBUTTON] = MMouseState;
@@ -52,7 +52,7 @@ BOOL WINAPI GetKeyboardStateHook(PBYTE lpKeyState) {
 		}
 	}
 	//Block only mouse input
-	else if (FrameworkInstance->PluginLoader.TyInputCombinedFlags & NoMouseInput) {
+	else if (FrameworkInstance->PluginLoader.TyInputCombinedFlags & NoMouseClickInput) {
 		lpKeyState[VK_LBUTTON] = 0;
 		lpKeyState[VK_MBUTTON] = 0;
 		lpKeyState[VK_RBUTTON] = 0;
@@ -222,6 +222,9 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			GUI::DrawGUI = !GUI::DrawGUI;
 			ShowCursor(GUI::DrawGUI);
 		}
+		//Stop the game from registering mouse movement for the camera when the GUI is open or no mouse input allowed
+		else if (msg == WM_INPUT && (GUI::DrawGUI || FrameworkInstance->PluginLoader.TyInputCombinedFlags & NoMouseCameraInput))
+			return true;
 
 		//Only run when the GUI is shown (so it doesn't unfocus the imgui window when its hidden)
 		if (GUI::DrawGUI)
@@ -230,8 +233,7 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			LRESULT WndProcResult = ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
 			//Plugin WndProc for if the plugin wants to block any WndProc from the game
 			bool pluginWndProcResult = APIHandler::Get()->PluginWndProc(hWnd, msg, wParam, lParam);
-			//Stop the game from registering mouse movement for the camera when the GUI is open
-			if (WndProcResult || pluginWndProcResult || msg == WM_INPUT)
+			if (WndProcResult || pluginWndProcResult)
 				return true;
 		}
 		//Allow WndProc events to still be sent for plugins even when the UI is hidden

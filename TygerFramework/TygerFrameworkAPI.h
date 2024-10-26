@@ -43,8 +43,11 @@ enum TyFImGuiElements {
 //Flags to block Ty from receiving inputs like mouse clicks
 enum TyBlockedInputsFlags {
 	None = 0,
-	NoMouseInput = 1 << 0,
-	NoKeyboardInput = 1 << 1
+	NoMouseClickInput = 1 << 0,
+	NoMouseCameraInput = 1 << 1,
+	NoKeyboardInput = 1 << 2,
+
+	NoMouseInput = NoMouseClickInput | NoMouseCameraInput
 };
 DEFINE_ENUM_FLAG_OPERATORS(TyBlockedInputsFlags)
 
