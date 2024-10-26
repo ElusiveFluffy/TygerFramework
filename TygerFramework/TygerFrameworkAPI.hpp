@@ -65,6 +65,10 @@ public:
 		return Get()->param()->functions->CurrentTyGame();
 	}
 
+	static std::filesystem::path GetPluginDirectory() {
+		return Get()->param()->functions->GetPluginDir();
+	}
+
 	//Writes a message to the console and the log file. Default log level is info
 	static void LogPluginMessage(std::string message, LogLevel logLevel = Info) {
 		Get()->param()->functions->LogPluginMessage("[" + PluginName + "] " + message, logLevel);

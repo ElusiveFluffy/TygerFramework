@@ -33,7 +33,8 @@ TygerFrameworkPluginFunctions pluginFunctions{
     TygerFrameworkOnTyInitialized,
     TygerFrameworkOnTyBeginShutdown,
     PluginSetTyBlockedInputProxy,
-    GetPluginsTyBlockedInputState
+    GetPluginsTyBlockedInputState,
+    TygerFramework::GetPluginDir
 };
 
 TygerFrameworkPluginInitializeParam pluginInitParam{

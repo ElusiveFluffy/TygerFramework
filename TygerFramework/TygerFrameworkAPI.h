@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <filesystem>
 
 //Needed for the WndProc inputs usually in precompiled headers but that needs to be turned off for imgui
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
@@ -68,8 +69,11 @@ typedef bool (*TyFTickBeforeGame)(std::string, TickBeforeGameFunc);
 
 //Order of these matters to be backwards compatible
 typedef struct {
+	//v0.1
 	void (*LogPluginMessage)(std::string message, LogLevel logLevel);
 	int (*CurrentTyGame)();
+
+	//v1.0.0
 	TyFDrawPluginUI AddDrawPluginUI;
 	TyFPluginImGuiWantCaptureMouse AddPluginImGuiWantCaptureMouse;
 	TyFPluginWndProc AddPluginWndProc;
@@ -78,10 +82,13 @@ typedef struct {
 	void (*SetImGuiFont)(void* imguiFont);
 	void (*SetTyFImGuiElements)(std::string pluginName, std::vector<TygerFrameworkImGuiParam> params);
 	TyFTickBeforeGame AddTickBeforeGame;
+
+	//v1.1.0
 	bool (*AddOnTyInitialized)(std::string, VoidFunc);
 	bool (*AddOnTyBeginShutdown)(std::string, VoidFunc);
 	bool (*SetTyBlockedInputs)(std::string pluginName, TyBlockedInputsFlags flags);
 	TyBlockedInputsFlags (*GetTyBlockedInputState)(std::string pluginName);
+	std::filesystem::path (*GetPluginDir)();
 }TygerFrameworkPluginFunctions;
 
 //Order of these matters to be backwards compatible
