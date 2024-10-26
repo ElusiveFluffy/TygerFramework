@@ -49,7 +49,7 @@ void PluginLoader::EarlyInit() try {
 
     fs::path pluginPath = TygerFramework::GetPluginDir();
     //Create it if it doesn't exist
-    if (!fs::create_directories(pluginPath) && !fs::exists(pluginPath)) {
+    if (!fs::exists(pluginPath) && !fs::create_directories(pluginPath)) {
         FrameworkInstance->LogMessage("[Plugin Loader] Failed to Create Plugin Folder!", TygerFramework::Error);
         return;
     }

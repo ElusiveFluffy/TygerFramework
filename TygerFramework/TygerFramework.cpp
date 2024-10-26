@@ -29,7 +29,12 @@ int32_t WINAPI TyBeginShutdown() {
 }
 
 std::filesystem::path TygerFramework::GetPluginDir() {
+#ifdef _DEBUG
+    return fs::current_path() / "Debug Plugins";
+#endif // DEBUG
+#ifdef NDEBUG
     return fs::current_path() / "Plugins";
+#endif // RELEASE
 }
 
 void TygerFramework::ToggleConsoleVisibility() {
