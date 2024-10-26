@@ -52,13 +52,6 @@ TygerFramework::TygerFramework(HMODULE TyHModule)
     LogMessage("[TygerFramework] Logger Started");
     LoadSettings();
 
-    if (mTyHModule) {
-        TyMemoryValues::TyBaseAddress = (DWORD)mTyHModule;
-        LogMessage("[TygerFramework] Got Ty Base Address");
-    }
-    else
-        LogMessage("[TygerFramework] Couldn't get Ty base address", Error);
-
     if (fs::exists("steam_appid.txt"))
     {
         std::ifstream steamAppIDFile("steam_appid.txt");
@@ -91,6 +84,17 @@ TygerFramework::TygerFramework(HMODULE TyHModule)
         LogMessage("[TygerFramework] steam_appid.txt not found, may be unable to accurately detect which Ty game is running, checking exe name", TygerFramework::Warning);
         AttemptToDetectGameFromExe();
     }
+    
+    if (mTyHModule) {
+        TyMemoryValues::TyBaseAddress = (DWORD)mTyHModule;
+        LogMessage("[TygerFramework] Got Ty Base Address");
+
+        if (TyGame == 1)
+            TyMemoryValues::SetTy1VersionText();
+    }
+    else
+        LogMessage("[TygerFramework] Couldn't get Ty base address", Error);
+
 
     //Setup MinHook
     MH_STATUS minhookStatus = MH_Initialize();

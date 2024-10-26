@@ -2,6 +2,9 @@
 #include "TyMemoryValues.h"
 #include "TygerFramework.h"
 #include "GUI.h"
+#include <format>
+
+char TyMemoryValues::VersionText[36];
 
 bool TyMemoryValues::HasGameInitialized()
 { 
@@ -15,6 +18,28 @@ bool TyMemoryValues::HasGameInitialized()
 	default:
 		return false;
 	}
+}
+
+void TyMemoryValues::SetTy1VersionText()
+{
+	//Pointer to the original text
+	int* textPointer = (int*)(TyBaseAddress + 0xe1486);
+	//Get the original text
+	char* originalVersionText = (char*)(*textPointer);
+
+	//Edit the version text, adding the original text onto the end
+	strcpy_s(VersionText, std::format("TygerFramework v{}.{}.{} | ", TygerFrameworkPluginVersion_Major, TygerFrameworkPluginVersion_Minor, TygerFrameworkPluginVersion_Patch).c_str());
+	strcat_s(VersionText, originalVersionText);
+
+	DWORD oldProtection;
+	//Change the memory access to ReadWrite to be able to change the hardcoded value (usually its read only)
+	VirtualProtect(textPointer, 4, PAGE_EXECUTE_READWRITE, &oldProtection);
+
+	//Set the pointer to TygerFramework's text
+	*textPointer = (int)&VersionText;
+
+	//Set it back to the old access protection
+	VirtualProtect(textPointer, 4, oldProtection, &oldProtection);
 }
 
 LPVOID* TyMemoryValues::GetTyShutdownFunc()
