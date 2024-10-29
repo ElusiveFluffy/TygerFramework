@@ -4,8 +4,6 @@
 #include "GUI.h"
 #include <format>
 
-char TyMemoryValues::VersionText[36];
-
 bool TyMemoryValues::HasGameInitialized()
 { 
 	switch (FrameworkInstance->CurrentTyGame()) {

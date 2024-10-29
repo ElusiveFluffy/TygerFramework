@@ -1,13 +1,11 @@
 #pragma once
-class TyMemoryValues
+namespace TyMemoryValues
 {
-public:
-	static inline DWORD TyBaseAddress;
-	static bool HasGameInitialized();
-	static int GetTy1GameState() { return *(int*)(TyBaseAddress + 0x288A6C); };
-	static void SetTy1VersionText();
-	static LPVOID* GetTyShutdownFunc();
+	inline DWORD TyBaseAddress;
+	bool HasGameInitialized();
+	inline int GetTy1GameState() { return *(int*)(TyBaseAddress + 0x288A6C); };
+	void SetTy1VersionText();
+	LPVOID* GetTyShutdownFunc();
 
-private:
-	static char VersionText[];
+	inline char VersionText[40];
 };
