@@ -14,6 +14,7 @@ public:
 
 	PluginLoader PluginLoader{};
 	static std::filesystem::path GetPluginDir();
+	static std::filesystem::path GetDependencyDir();
 	auto getFrameworkModule() const { return mTyHModule; };
 	int CurrentTyGame() const { return TyGame; };
 	TygerFramework(HMODULE TyHModule);

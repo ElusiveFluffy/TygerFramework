@@ -32,9 +32,14 @@ public:
 
 private:
 	void CombineTyBlockedInputs();
+	void PluginEarlyInit();
+	void DependencyInit();
 
 	std::map<std::string, HMODULE> mPlugins{};
 	std::map<std::string, std::string> mPluginErrors{};
+
+	std::map<std::string, HMODULE> mDependencies{};
+	std::map<std::string, std::string> mDependencyErrors{};
 	//Just so each plugin can be kept track of without needing to have a check every frame for what input they want
 	std::map<std::string, TyBlockedInputsFlags> mPluginTyInputFlags{};
 };

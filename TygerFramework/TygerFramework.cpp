@@ -37,6 +37,10 @@ std::filesystem::path TygerFramework::GetPluginDir() {
 #endif // RELEASE
 }
 
+std::filesystem::path TygerFramework::GetDependencyDir() {
+    return GetPluginDir() / "Dependencies";
+}
+
 void TygerFramework::ToggleConsoleVisibility() {
     if (IsWindowVisible(GetConsoleWindow()))
         ShowWindow(GetConsoleWindow(), SW_HIDE);

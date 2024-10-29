@@ -8,6 +8,7 @@
 #include "APIHandler.h"
 #include "Fonts/RobotoMedium.hpp"
 #include "GUI.h"
+namespace fs = std::filesystem;
 
 namespace tygerFramework {
     void LogPluginMessage(std::string message, LogLevel logLevel) {
@@ -43,10 +44,44 @@ TygerFrameworkPluginInitializeParam pluginInitParam{
     &pluginFunctions
 };
 
-void PluginLoader::EarlyInit() try {
-    namespace fs = std::filesystem;
+void PluginLoader::DependencyInit() try {
 
-    FrameworkInstance->LogMessage("[Plugin Loader] Early Initialization Started");
+    fs::path dependencyPath = TygerFramework::GetDependencyDir();
+    //Create it if it doesn't exist
+    if (!fs::exists(dependencyPath) && !fs::create_directories(dependencyPath)) {
+        FrameworkInstance->LogMessage("[Plugin Loader] Failed to Create Dependency Folder!", TygerFramework::Error);
+        return;
+    }
+    FrameworkInstance->LogMessage("[Plugin Loader] Loading Dependencies From: " + dependencyPath.string());
+
+    for (auto&& entry : fs::directory_iterator{ dependencyPath }) {
+        auto&& path = entry.path();
+
+        if (path.has_extension() && path.extension() == ".dll") {
+            auto module = LoadLibrary(path.c_str());
+
+            FrameworkInstance->LogMessage("[Plugin Loader] Loading: " + path.stem().string());
+
+            if (module == nullptr) {
+                FrameworkInstance->LogMessage("[Plugin Loader] Failed to Load Dependency: " + path.stem().string(), TygerFramework::Error);
+                mDependencyErrors.emplace(path.stem().string(), "Failed to Load");
+                continue;
+            }
+
+            mDependencies.emplace(path.stem().string(), module);
+        }
+    }
+}
+catch (const std::exception& e) {
+    std::string message = "[Plugin Loader] Error Occured During Dependency Initilization: ";
+    message += e.what();
+    FrameworkInstance->LogMessage(message, TygerFramework::Error);
+}
+catch (...) {
+    FrameworkInstance->LogMessage("[Plugin Loader] Unhandled Exception Occured During Dependency Initilization", TygerFramework::Error);
+}
+
+void PluginLoader::PluginEarlyInit() try {
 
     fs::path pluginPath = TygerFramework::GetPluginDir();
     //Create it if it doesn't exist
@@ -81,6 +116,14 @@ catch (const std::exception& e) {
 }
 catch (...) {
     FrameworkInstance->LogMessage("[Plugin Loader] Unhandled Exception Occured During Plugin Early Initilization", TygerFramework::Error);
+}
+
+void PluginLoader::EarlyInit() {
+    FrameworkInstance->LogMessage("[Plugin Loader] Early Initialization Started");
+
+    //Initialize Dependencies first
+    DependencyInit();
+    PluginEarlyInit();
 }
 
 //Call TygerFrameworkPluginInitialize on any dlls that export it
@@ -230,6 +273,29 @@ void PluginLoader::DrawUI() {
             }
             ImGui::TreePop();
         }
+
+        ImGui::Spacing();
+
+        if (!mDependencies.empty()) {
+            ImGui::Text("Loaded Dependencies:");
+            ImGui::TreePush("Dependencies");
+            for (auto&& [name, _] : mDependencies) {
+                ImGui::Text(name.c_str());
+            }
+
+            ImGui::TreePop();
+        }
+
+        if (!mDependencyErrors.empty()) {
+            ImGui::Text("Dependency Errors:");
+            ImGui::TreePush("Dependency Errors");
+            for (auto&& [name, _] : mDependencyErrors) {
+                ImGui::Text(name.c_str());
+            }
+
+            ImGui::TreePop();
+        }
+
     }
 }
 
