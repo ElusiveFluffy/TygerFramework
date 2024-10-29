@@ -192,20 +192,20 @@ void GUI::Draw() {
 		ImGui::SameLine();
 		ImGui::Text("(?)");
 		if (ImGui::IsItemHovered())
-			ImGui::SetTooltip("Allows the game to register mouse clicks and keyboard input while the menu is open but not focused.");
+			ImGui::SetTooltip("Allows the game to register mouse clicks while the menu is open but not focused.");
 
 		ImGui::Checkbox("Keyboard Always Passthrough", &FrameworkInstance->KeyboardAlwaysPassthrough);
 		ImGui::SameLine();
 		ImGui::Text("(?)");
 		if (ImGui::IsItemHovered())
-			ImGui::SetTooltip("Allows the game to register keyboard input even while the menu is focused.");
+			ImGui::SetTooltip("Allows the game to register keyboard input when its usually blocked.");
 		FrameworkInstance->PluginLoader.DrawUI();
 		FrameworkInstance->PluginLoader.PluginDrawInTygerFrameworkWindow();
 
 
 		ImGui::End();
 
-		ImGui::ShowDemoWindow();
+		//ImGui::ShowDemoWindow();
 	}
 	//Needs to be called after NewFrame
 	ImGui::Render();
