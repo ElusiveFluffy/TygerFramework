@@ -8,6 +8,11 @@ public:
 	//If you want a different name, can change the plugin name in DllMain
 	static inline std::string PluginName = "Plugin";
 
+	//Returns true if initialized
+	static bool IsInitialized() {
+		return mInstance != nullptr;
+	}
+
 	static auto& Initialize(const TygerFrameworkPluginInitializeParam* param) {
 		if (param == nullptr) {
 			throw std::runtime_error("param is null");
