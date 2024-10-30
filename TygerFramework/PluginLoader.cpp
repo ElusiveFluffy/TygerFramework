@@ -197,8 +197,22 @@ void PluginLoader::Initialize() {
             continue;
         }
 
-        //Check which major and minor version is needed
-        if (requiredVersion.Major > TygerFrameworkPluginVersion_Major || requiredVersion.Minor > TygerFrameworkPluginVersion_Minor) {
+        //Check which major version is needed
+        if (requiredVersion.Major != TygerFrameworkPluginVersion_Major) {
+            FrameworkInstance->LogMessage(std::format("[Plugin Loader] {} Requires TygerFramework Major Version {}.{}.{}, But Version {}.{}.{} is Installed", 
+                                                       pluginName, 
+                                                       requiredVersion.Major, requiredVersion.Minor, requiredVersion.Patch, //Plugin Required Version
+                                                       TygerFrameworkPluginVersion_Major, TygerFrameworkPluginVersion_Minor, TygerFrameworkPluginVersion_Patch), TygerFramework::Error); //Loader Version
+            mPluginErrors.emplace(pluginName, std::format("Requires TygerFramework Major Version {}.{}.{}",
+                                                           requiredVersion.Major, requiredVersion.Minor, requiredVersion.Patch));
+            FreeLibrary(pluginModule);
+            plugins = mPlugins.erase(plugins);
+            continue;
+        }
+        //Check which minor and patch version is needed
+        //Need to check the minor version for patch so that if the plugin needs a version like 1.1.2 and the loader is on 1.2.0 this doesn't give a false error
+        else if (requiredVersion.Minor > TygerFrameworkPluginVersion_Minor || 
+                (requiredVersion.Patch > TygerFrameworkPluginVersion_Patch && requiredVersion.Minor == TygerFrameworkPluginVersion_Minor)) {
             FrameworkInstance->LogMessage(std::format("[Plugin Loader] {} Requires TygerFramework Version {}.{}.{} or Newer, But Version {}.{}.{} is Installed", 
                                                        pluginName, 
                                                        requiredVersion.Major, requiredVersion.Minor, requiredVersion.Patch, //Plugin Required Version
@@ -208,15 +222,6 @@ void PluginLoader::Initialize() {
             FreeLibrary(pluginModule);
             plugins = mPlugins.erase(plugins);
             continue;
-        }
-
-        //Warn about the patch version
-        //Need to check the minor version so that if the plugin needs a version like 1.1.2 and the loader is on 1.2.0 this doesn't give a false warning
-        if (requiredVersion.Patch > TygerFrameworkPluginVersion_Patch && requiredVersion.Minor == TygerFrameworkPluginVersion_Minor) {
-            FrameworkInstance->LogMessage(std::format("[Plugin Loader] {} Desires Atleast Patch version x.{}.{}", 
-                                                       pluginName, 
-                                                       requiredVersion.Minor, requiredVersion.Patch), TygerFramework::Warning);
-            mPluginWarnings.emplace(pluginName, std::format("Desires Atleast Patch version x.{}.{}", requiredVersion.Minor, requiredVersion.Patch));
         }
 
         ++plugins;
