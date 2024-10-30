@@ -79,7 +79,7 @@ typedef struct {
 	TyFPluginImGuiWantCaptureMouse AddPluginImGuiWantCaptureMouse;
 	TyFPluginWndProc AddPluginWndProc;
 	HWND(*GetTyWindowHandle)();
-	bool (*DrawingGUI)(); //Only use for imgui if you have a special use case
+	bool (*DrawingGUI)();
 	void (*SetImGuiFont)(void* imguiFont);
 	void (*SetTyFImGuiElements)(std::string pluginName, std::vector<TygerFrameworkImGuiParam> params);
 	TyFTickBeforeGame AddTickBeforeGame;

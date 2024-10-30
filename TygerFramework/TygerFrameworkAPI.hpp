@@ -13,6 +13,8 @@ public:
 		return mInstance != nullptr;
 	}
 
+	//Call this when the TygerFramework Plugin Initialize export function gets called, 
+	//and before you call any other API functions.
 	static auto& Initialize(const TygerFrameworkPluginInitializeParam* param) {
 		if (param == nullptr) {
 			throw std::runtime_error("param is null");
@@ -54,7 +56,7 @@ public:
 		return API::Get()->param()->functions->GetTyWindowHandle();
 	}
 
-	//Gets if TygerFramework is drawing the GUI. Only use for imgui if you have a special use case
+	//Checks if TygerFramework is drawing the GUI
 	static bool DrawingGUI() {
 		return API::Get()->param()->functions->DrawingGUI();
 	}
@@ -70,6 +72,7 @@ public:
 		return Get()->param()->functions->CurrentTyGame();
 	}
 
+	//Gets the current plugin directory (will be different for debug/release builds of TygerFramework)
 	static std::filesystem::path GetPluginDirectory() {
 		return Get()->param()->functions->GetPluginDir();
 	}
@@ -84,7 +87,7 @@ public:
 		Get()->param()->functions->SetImGuiFont(imguiFont);
 	}
 
-	//Sets all the elements for drawing elements from the plugin in the TygerFramework window
+	//Sets the elements from the plugin that will be drawn below the plugin section in the TygerFramework ImGui window.
 	//Overwrites the old value if its called again
 	static void SetTygerFrameworkImGuiElements(std::vector<TygerFrameworkImGuiParam> elements) {
 		Get()->param()->functions->SetTyFImGuiElements(PluginName, elements);
