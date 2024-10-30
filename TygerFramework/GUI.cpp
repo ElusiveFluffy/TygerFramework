@@ -2,6 +2,7 @@
 #include "GUI.h"
 #include "TygerFramework.h"
 #include "MinHook.h"
+#include "Logger.h"
 #include "APIHandler.h"
 #include "TygerFrameworkAPI.h"
 #include <format>
@@ -65,14 +66,14 @@ bool HookInput() {
 	MH_STATUS minHookStatus = MH_CreateHookApi(L"User32.dll", "SetCursorPos", &SetCursorPosHook, reinterpret_cast<LPVOID*>(&Original_SetCursorPos));
 	if (minHookStatus != MH_OK) {
 		std::string error = MH_StatusToString(minHookStatus);
-		FrameworkInstance->LogMessage("[GUI] Failed to Create the SetCursorPos Hook, With the Error: " + error, TygerFramework::Error);
+		Logger::LogMessage("[GUI] Failed to Create the SetCursorPos Hook, With the Error: " + error, Error);
 		return false;
 	}
 	//Hook GetKeyboardState
 	minHookStatus = MH_CreateHookApi(L"User32.dll", "GetKeyboardState", &GetKeyboardStateHook, reinterpret_cast<LPVOID*>(&Original_GetKeyboardState));
 	if (minHookStatus != MH_OK) {
 		std::string error = MH_StatusToString(minHookStatus);
-		FrameworkInstance->LogMessage("[GUI] Failed to Create the GetKeyboardState Hook, With the Error: " + error, TygerFramework::Error);
+		Logger::LogMessage("[GUI] Failed to Create the GetKeyboardState Hook, With the Error: " + error, Error);
 		return false;
 	}
 
@@ -80,11 +81,11 @@ bool HookInput() {
 	minHookStatus = MH_EnableHook(MH_ALL_HOOKS);
 	if (minHookStatus != MH_OK) {
 		std::string error = MH_StatusToString(minHookStatus);
-		FrameworkInstance->LogMessage("[GUI] Failed to Enable the Mouse Hooks, With the Error: " + error, TygerFramework::Error);
+		Logger::LogMessage("[GUI] Failed to Enable the Mouse Hooks, With the Error: " + error, Error);
 		return false;
 	}
 
-	FrameworkInstance->LogMessage("[GUI] Hooked Mouse Input");
+	Logger::LogMessage("[GUI] Hooked Mouse Input");
 	return true;
 }
 
@@ -107,11 +108,11 @@ bool GUI::Init() {
 	FrameworkInstance->TyWindowHandle = FindWindowA(NULL, tyWindowName);
 
 	if (!FrameworkInstance->TyWindowHandle) {
-		FrameworkInstance->LogMessage("[GUI] Failed to Get Ty Window Handle", TygerFramework::Error);
+		Logger::LogMessage("[GUI] Failed to Get Ty Window Handle", Error);
 		return false;
 	}
 	Original_Wndproc = (WNDPROC)SetWindowLongPtrW(FrameworkInstance->TyWindowHandle, GWLP_WNDPROC, (LONG_PTR)WndProc);
-	FrameworkInstance->LogMessage("[GUI] Successfully Got Ty Window Handle");
+	Logger::LogMessage("[GUI] Successfully Got Ty Window Handle");
 
 	//Hook all the stuff needed to disable mouse input
 	HookInput();

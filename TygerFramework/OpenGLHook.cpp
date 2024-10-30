@@ -2,6 +2,7 @@
 #include "OpenGLHook.h"
 #include "MinHook.h"
 #include "TygerFramework.h"
+#include "Logger.h"
 #include "GUI.h"
 
 typedef BOOL (WINAPI* wglSwapBuffers_t) (HDC hDC);
@@ -37,14 +38,14 @@ bool OpenGLHook::Hook() {
 	MH_STATUS minHookStatus = MH_CreateHookApi(L"OPENGL32.dll", "wglSwapBuffers", &wglSwapBuffers_Func, reinterpret_cast<LPVOID*>(&Original_wglSwapBuffers));
 	if (minHookStatus != MH_OK) {
 		std::string error = MH_StatusToString(minHookStatus);
-		FrameworkInstance->LogMessage("[OpenGL Hook] Failed to Create the OpenGL Hook, With the Error: " + error, TygerFramework::Error);
+		Logger::LogMessage("[OpenGL Hook] Failed to Create the OpenGL Hook, With the Error: " + error, Error);
 		return false;
 	}
 
 	minHookStatus = MH_EnableHook(MH_ALL_HOOKS);
 	if (minHookStatus != MH_OK) {
 		std::string error = MH_StatusToString(minHookStatus);
-		FrameworkInstance->LogMessage("[OpenGL Hook] Failed to Enable the OpenGL Hook, With the Error: " + error, TygerFramework::Error);
+		Logger::LogMessage("[OpenGL Hook] Failed to Enable the OpenGL Hook, With the Error: " + error, Error);
 		return false;
 	}
 

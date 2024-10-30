@@ -6,22 +6,19 @@
 #include <format>
 #include "imgui.h"
 #include "APIHandler.h"
+#include "Logger.h"
 #include "Fonts/RobotoMedium.hpp"
 #include "GUI.h"
 namespace fs = std::filesystem;
 
 namespace tygerFramework {
-    void LogPluginMessage(std::string message, LogLevel logLevel) {
-        FrameworkInstance->LogMessage(message, (TygerFramework::LogLevel)logLevel);
-    }
-
     int CurrentTyGame() {
         return FrameworkInstance->CurrentTyGame();
     }
 }
 
 TygerFrameworkPluginFunctions pluginFunctions{
-    tygerFramework::LogPluginMessage,
+    Logger::LogMessage,
     tygerFramework::CurrentTyGame,
     TygerFrameworkDrawPluginUi,
     TygerFrameworkPluginImguiWantCaptureMouse,
@@ -75,10 +72,10 @@ void PluginLoader::DependencyInit() try {
     fs::path dependencyPath = TygerFramework::GetDependencyDir();
     //Create it if it doesn't exist
     if (!fs::exists(dependencyPath) && !fs::create_directories(dependencyPath)) {
-        FrameworkInstance->LogMessage("[Plugin Loader] Failed to Create Dependency Folder!", TygerFramework::Error);
+        Logger::LogMessage("[Plugin Loader] Failed to Create Dependency Folder!", Error);
         return;
     }
-    FrameworkInstance->LogMessage("[Plugin Loader] Loading Dependencies From: " + dependencyPath.string());
+    Logger::LogMessage("[Plugin Loader] Loading Dependencies From: " + dependencyPath.string());
 
     for (auto&& entry : fs::directory_iterator{ dependencyPath }) {
         auto&& path = entry.path();
@@ -86,12 +83,12 @@ void PluginLoader::DependencyInit() try {
         if (path.has_extension() && path.extension() == ".dll") {
             auto module = LoadLibrary(path.c_str());
 
-            FrameworkInstance->LogMessage("[Plugin Loader] Loading: " + path.stem().string());
+            Logger::LogMessage("[Plugin Loader] Loading: " + path.stem().string());
 
             if (module == nullptr) {
                 DWORD errorCode = GetLastError();
                 std::string errorMessage = GetLastErrorAsString(errorCode);
-                FrameworkInstance->LogMessage("[Plugin Loader] Failed to Load Dependency: " + path.stem().string() + ", With the Error: " + errorMessage, TygerFramework::Error);
+                Logger::LogMessage("[Plugin Loader] Failed to Load Dependency: " + path.stem().string() + ", With the Error: " + errorMessage, Error);
                 mDependencyErrors.emplace(path.stem().string(), "Failed to Load With the Error: " + errorMessage);
                 continue;
             }
@@ -103,10 +100,10 @@ void PluginLoader::DependencyInit() try {
 catch (const std::exception& e) {
     std::string message = "[Plugin Loader] Error Occured During Dependency Initilization: ";
     message += e.what();
-    FrameworkInstance->LogMessage(message, TygerFramework::Error);
+    Logger::LogMessage(message, Error);
 }
 catch (...) {
-    FrameworkInstance->LogMessage("[Plugin Loader] Unhandled Exception Occured During Dependency Initilization", TygerFramework::Error);
+    Logger::LogMessage("[Plugin Loader] Unhandled Exception Occured During Dependency Initilization", Error);
 }
 
 void PluginLoader::PluginEarlyInit() try {
@@ -114,10 +111,10 @@ void PluginLoader::PluginEarlyInit() try {
     fs::path pluginPath = TygerFramework::GetPluginDir();
     //Create it if it doesn't exist
     if (!fs::exists(pluginPath) && !fs::create_directories(pluginPath)) {
-        FrameworkInstance->LogMessage("[Plugin Loader] Failed to Create Plugin Folder!", TygerFramework::Error);
+        Logger::LogMessage("[Plugin Loader] Failed to Create Plugin Folder!", Error);
         return;
     }
-    FrameworkInstance->LogMessage("[Plugin Loader] Loading Plugins From: " + pluginPath.string());
+    Logger::LogMessage("[Plugin Loader] Loading Plugins From: " + pluginPath.string());
 
     for (auto&& entry : fs::directory_iterator{ pluginPath }) {
         auto&& path = entry.path();
@@ -125,12 +122,12 @@ void PluginLoader::PluginEarlyInit() try {
         if (path.has_extension() && path.extension() == ".dll") {
             auto module = LoadLibrary(path.c_str());
 
-            FrameworkInstance->LogMessage("[Plugin Loader] Loading: " + path.stem().string());
+            Logger::LogMessage("[Plugin Loader] Loading: " + path.stem().string());
 
             if (module == nullptr) {
                 DWORD errorCode = GetLastError();
                 std::string errorMessage = GetLastErrorAsString(errorCode);
-                FrameworkInstance->LogMessage("[Plugin Loader] Failed to Load Plugin: " + path.stem().string() + ", With the Error: " + errorMessage + "(" + std::to_string(errorCode) + ")", TygerFramework::Error);
+                Logger::LogMessage("[Plugin Loader] Failed to Load Plugin: " + path.stem().string() + ", With the Error: " + errorMessage + "(" + std::to_string(errorCode) + ")", Error);
                 mPluginErrors.emplace(path.stem().string(), "Failed to Load: " + errorMessage + "(" + std::to_string(errorCode) + ")");
                 continue;
             }
@@ -142,14 +139,14 @@ void PluginLoader::PluginEarlyInit() try {
 catch (const std::exception& e) {
     std::string message = "[Plugin Loader] Error Occured During Plugin Early Initilization: ";
     message += e.what();
-    FrameworkInstance->LogMessage(message, TygerFramework::Error);
+    Logger::LogMessage(message, Error);
 }
 catch (...) {
-    FrameworkInstance->LogMessage("[Plugin Loader] Unhandled Exception Occured During Plugin Early Initilization", TygerFramework::Error);
+    Logger::LogMessage("[Plugin Loader] Unhandled Exception Occured During Plugin Early Initilization", Error);
 }
 
 void PluginLoader::EarlyInit() {
-    FrameworkInstance->LogMessage("[Plugin Loader] Early Initialization Started");
+    Logger::LogMessage("[Plugin Loader] Early Initialization Started");
 
     //Initialize Dependencies first
     DependencyInit();
@@ -169,7 +166,7 @@ void PluginLoader::Initialize() {
 
         //If the plugin doesn't implement the function it just skip it
         if (pluginRequiredVersionFunc == nullptr) {
-            FrameworkInstance->LogMessage("[Plugin Loader] " + pluginName + " Doesn't Have a TygerFrameworkPluginRequiredVersion Function, Skipping");
+            Logger::LogMessage("[Plugin Loader] " + pluginName + " Doesn't Have a TygerFrameworkPluginRequiredVersion Function, Skipping");
 
             ++plugins;
             continue;
@@ -181,7 +178,7 @@ void PluginLoader::Initialize() {
             pluginRequiredVersionFunc(&requiredVersion);
         }
         catch (...) {
-            FrameworkInstance->LogMessage("[Plugin Loader] " + pluginName + "Had An Exception Occur In TygerFrameworkPluginRequiredVersion, Skipping", TygerFramework::Error);
+            Logger::LogMessage("[Plugin Loader] " + pluginName + "Had An Exception Occur In TygerFrameworkPluginRequiredVersion, Skipping", Error);
             mPluginErrors.emplace(pluginName, "An Exception Occured In TygerFrameworkPluginRequiredVersion");
             FreeLibrary(pluginModule);
             plugins = mPlugins.erase(plugins);
@@ -190,7 +187,7 @@ void PluginLoader::Initialize() {
 
         //Check if the plugin requires a specific game
         if (requiredVersion.CompatibleGames.size() != 0 && std::find(std::begin(requiredVersion.CompatibleGames), std::end(requiredVersion.CompatibleGames), FrameworkInstance->CurrentTyGame()) == std::end(requiredVersion.CompatibleGames)) {
-            FrameworkInstance->LogMessage(std::format("[Plugin Loader] {} Is Incompatible with Ty {}", pluginName, FrameworkInstance->CurrentTyGame()), TygerFramework::Error);
+            Logger::LogMessage(std::format("[Plugin Loader] {} Is Incompatible with Ty {}", pluginName, FrameworkInstance->CurrentTyGame()), Error);
             mPluginErrors.emplace(pluginName, std::format("Incompatible with Ty {}", FrameworkInstance->CurrentTyGame()));
             FreeLibrary(pluginModule);
             plugins = mPlugins.erase(plugins);
@@ -199,10 +196,10 @@ void PluginLoader::Initialize() {
 
         //Check which major version is needed
         if (requiredVersion.Major != TygerFrameworkPluginVersion_Major) {
-            FrameworkInstance->LogMessage(std::format("[Plugin Loader] {} Requires TygerFramework Major Version {}.{}.{}, But Version {}.{}.{} is Installed", 
+            Logger::LogMessage(std::format("[Plugin Loader] {} Requires TygerFramework Major Version {}.{}.{}, But Version {}.{}.{} is Installed", 
                                                        pluginName, 
                                                        requiredVersion.Major, requiredVersion.Minor, requiredVersion.Patch, //Plugin Required Version
-                                                       TygerFrameworkPluginVersion_Major, TygerFrameworkPluginVersion_Minor, TygerFrameworkPluginVersion_Patch), TygerFramework::Error); //Loader Version
+                                                       TygerFrameworkPluginVersion_Major, TygerFrameworkPluginVersion_Minor, TygerFrameworkPluginVersion_Patch), Error); //Loader Version
             mPluginErrors.emplace(pluginName, std::format("Requires TygerFramework Major Version {}.{}.{}",
                                                            requiredVersion.Major, requiredVersion.Minor, requiredVersion.Patch));
             FreeLibrary(pluginModule);
@@ -213,10 +210,10 @@ void PluginLoader::Initialize() {
         //Need to check the minor version for patch so that if the plugin needs a version like 1.1.2 and the loader is on 1.2.0 this doesn't give a false error
         else if (requiredVersion.Minor > TygerFrameworkPluginVersion_Minor || 
                 (requiredVersion.Patch > TygerFrameworkPluginVersion_Patch && requiredVersion.Minor == TygerFrameworkPluginVersion_Minor)) {
-            FrameworkInstance->LogMessage(std::format("[Plugin Loader] {} Requires TygerFramework Version {}.{}.{} or Newer, But Version {}.{}.{} is Installed", 
+            Logger::LogMessage(std::format("[Plugin Loader] {} Requires TygerFramework Version {}.{}.{} or Newer, But Version {}.{}.{} is Installed", 
                                                        pluginName, 
                                                        requiredVersion.Major, requiredVersion.Minor, requiredVersion.Patch, //Plugin Required Version
-                                                       TygerFrameworkPluginVersion_Major, TygerFrameworkPluginVersion_Minor, TygerFrameworkPluginVersion_Patch), TygerFramework::Error); //Loader Version
+                                                       TygerFrameworkPluginVersion_Major, TygerFrameworkPluginVersion_Minor, TygerFrameworkPluginVersion_Patch), Error); //Loader Version
             mPluginErrors.emplace(pluginName, std::format("Requires TygerFramework Version {}.{}.{} or Newer",
                                                            requiredVersion.Major, requiredVersion.Minor, requiredVersion.Patch));
             FreeLibrary(pluginModule);
@@ -240,17 +237,17 @@ void PluginLoader::Initialize() {
         }
 
         pluginInitParam.pluginFileName = pluginName;
-        FrameworkInstance->LogMessage("[Plugin Loader] Initializing: " + pluginName);
+        Logger::LogMessage("[Plugin Loader] Initializing: " + pluginName);
         try {
             if (!pluginInitializer(&pluginInitParam)) {
                 if (pluginInitParam.initErrorMessage != "")
                 {
-                    FrameworkInstance->LogMessage("[Plugin Loader] Failed to Initialize: " + pluginName + ", With the Error: " + pluginInitParam.initErrorMessage, TygerFramework::Error);
+                    Logger::LogMessage("[Plugin Loader] Failed to Initialize: " + pluginName + ", With the Error: " + pluginInitParam.initErrorMessage, Error);
                     mPluginErrors.emplace(pluginName, "Failed to Initialize: " + pluginInitParam.initErrorMessage);
                 }
                 else
                 {
-                    FrameworkInstance->LogMessage("[Plugin Loader] Failed to Initialize: " + pluginName + ", With No Error Message Provided", TygerFramework::Error);
+                    Logger::LogMessage("[Plugin Loader] Failed to Initialize: " + pluginName + ", With No Error Message Provided", Error);
                     mPluginErrors.emplace(pluginName, "Failed to Initialize: No Error Message Provided");
                 }
                 FreeLibrary(pluginModule);
@@ -259,7 +256,7 @@ void PluginLoader::Initialize() {
             }
         }
         catch (...) {
-            FrameworkInstance->LogMessage("[Plugin Loader] " + pluginName + "Had An Exception Occur In TygerFrameworkPluginInitialize, Skipping", TygerFramework::Error);
+            Logger::LogMessage("[Plugin Loader] " + pluginName + "Had An Exception Occur In TygerFrameworkPluginInitialize, Skipping", Error);
             mPluginErrors.emplace(pluginName, "An Exception Occured In TygerFrameworkPluginInitialize");
             FreeLibrary(pluginModule);
             plugins = mPlugins.erase(plugins);
@@ -354,7 +351,7 @@ void PluginLoader::PluginDrawInTygerFrameworkWindow()
             case CollapsingHeader:
                 //Return it if the text is blank
                 if (param.Text == "") {
-                    FrameworkInstance->LogMessage("[" + pluginName + "]" + " Error, missing text for CollapsingHeader TygerFramework ImGui function! Returning Early", TygerFramework::Error);
+                    Logger::LogMessage("[" + pluginName + "]" + " Error, missing text for CollapsingHeader TygerFramework ImGui function! Returning Early", Error);
                     return;
                 }
 
@@ -379,7 +376,7 @@ void PluginLoader::PluginDrawInTygerFrameworkWindow()
             case SetTooltip:
                 //Skip it if the text is blank
                 if (param.Text == "") {
-                    FrameworkInstance->LogMessage("[" + pluginName + "]" + " Error, missing text for SetTooltip TygerFramework ImGui function! Skipping", TygerFramework::Error);
+                    Logger::LogMessage("[" + pluginName + "]" + " Error, missing text for SetTooltip TygerFramework ImGui function! Skipping", Error);
                     break;
                 }
 
@@ -389,7 +386,7 @@ void PluginLoader::PluginDrawInTygerFrameworkWindow()
             case TreePush:
                 //Skip it if the text is blank
                 if (param.Text == "") {
-                    FrameworkInstance->LogMessage("[" + pluginName + "]" + " Error, missing text for TreePush TygerFramework ImGui function! Skipping", TygerFramework::Error);
+                    Logger::LogMessage("[" + pluginName + "]" + " Error, missing text for TreePush TygerFramework ImGui function! Skipping", Error);
                     break;
                 }
 

@@ -1,24 +1,15 @@
 #pragma once
 #include <filesystem>
-#include <fstream>
 #include "PluginLoader.h"
 class TygerFramework
 {
 public:
-	enum LogLevel
-	{
-		Info,
-		Warning,
-		Error
-	};
-
 	PluginLoader PluginLoader{};
 	static std::filesystem::path GetPluginDir();
 	static std::filesystem::path GetDependencyDir();
 	auto getFrameworkModule() const { return mTyHModule; };
 	int CurrentTyGame() const { return TyGame; };
 	TygerFramework(HMODULE TyHModule);
-	void LogMessage(std::string message, LogLevel errorType = Info);
 	void Shutdown();
 
 	bool SetTyInputFlag(TyInputsFlags flag, bool enableFlag);
@@ -40,7 +31,6 @@ public:
 
 private:
 	HMODULE mTyHModule;
-	std::ofstream mLogger;
 
 	int TyGame;
 	static constexpr int Ty1AppID = 411960;

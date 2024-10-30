@@ -1,15 +1,17 @@
 #include "pch.h"
 #include "TygerFramework.h"
+#include <iostream>
 #include <filesystem>
 #include <fstream>
-#include <iostream>
 #include "MinHook.h"
 #include "OpenGLHook.h"
 #include "GUI.h"
 #include "TyMemoryValues.h"
 #include "APIHandler.h"
+#include "Logger.h"
 #include "ini.h"
 namespace fs = std::filesystem;
+using namespace Logger;
 
 std::unique_ptr<TygerFramework> FrameworkInstance;
 
@@ -20,7 +22,7 @@ typedef int32_t(WINAPI* TyShutdown_t) ();
 TyShutdown_t Original_TyShutdown;
 
 int32_t WINAPI TyBeginShutdown() {
-    FrameworkInstance->LogMessage("[Ty Shutdown Hook] Ty Began Shutting Down");
+    LogMessage("[Ty Shutdown Hook] Ty Began Shutting Down");
     //Notify all plugins
     APIHandler::Get()->OnTyBeginShutdown();
 
@@ -51,7 +53,7 @@ void TygerFramework::ToggleConsoleVisibility() {
 TygerFramework::TygerFramework(HMODULE TyHModule)
     : mTyHModule{ TyHModule }
 {
-    mLogger.open("TygerFrameworkLog.txt");
+    Logger::StartLogger();
     CreateConsole();
     LogMessage("[TygerFramework] Logger Started");
     LoadSettings();
@@ -78,14 +80,14 @@ TygerFramework::TygerFramework(HMODULE TyHModule)
             LogMessage("[TygerFramework] Ty " + std::to_string(TyGame) + " Detected");
         }
         else {
-            LogMessage("[TygerFramework] Invalid steam_appid found, may be unable to accurately detect which Ty game is running, checking exe name", TygerFramework::Warning);
+            LogMessage("[TygerFramework] Invalid steam_appid found, may be unable to accurately detect which Ty game is running, checking exe name", Warning);
             AttemptToDetectGameFromExe();
         }
     }
     else
     {
         //If you're running it on steam it should always have this but just in case
-        LogMessage("[TygerFramework] steam_appid.txt not found, may be unable to accurately detect which Ty game is running, checking exe name", TygerFramework::Warning);
+        LogMessage("[TygerFramework] steam_appid.txt not found, may be unable to accurately detect which Ty game is running, checking exe name", Warning);
         AttemptToDetectGameFromExe();
     }
     
@@ -126,7 +128,7 @@ TygerFramework::TygerFramework(HMODULE TyHModule)
 void WINAPI TyOutputDebugString(LPCSTR lpOutputString) {
     //Only log to the console if the option is enabled
     if (FrameworkInstance->TyLogInConsole)
-        std::cout << "[Ty Log] " << lpOutputString;
+        std::cout << GetTimeStamp() << "[Ty Log] " << lpOutputString;
     Original_OutputDebugString(lpOutputString);
 }
 
@@ -135,14 +137,14 @@ bool TygerFramework::HookTyDebugOutput()
     MH_STATUS minHookStatus = MH_CreateHookApi(L"Kernel32.dll", "OutputDebugStringA", &TyOutputDebugString, reinterpret_cast<LPVOID*>(&Original_OutputDebugString));
     if (minHookStatus != MH_OK) {
         std::string error = MH_StatusToString(minHookStatus);
-        LogMessage("[Ty Log Hook] Failed to Create the Ty Log Hook, With the Error: " + error, TygerFramework::Error);
+        LogMessage("[Ty Log Hook] Failed to Create the Ty Log Hook, With the Error: " + error, Error);
         return false;
     }
 
     minHookStatus = MH_EnableHook(MH_ALL_HOOKS);
     if (minHookStatus != MH_OK) {
         std::string error = MH_StatusToString(minHookStatus);
-        LogMessage("[Ty Log Hook] Failed to Enable the Ty Log Hook, With the Error: " + error, TygerFramework::Error);
+        LogMessage("[Ty Log Hook] Failed to Enable the Ty Log Hook, With the Error: " + error, Error);
         return false;
     }
 
@@ -252,38 +254,7 @@ void TygerFramework::AttemptToDetectGameFromExe() {
         LogMessage("[TygerFramework] Ty " + std::to_string(TyGame) + " Sucessfully Detected");
     }
     else {
-        LogMessage("[TygerFramework] Unable to detect which Ty game is running from the exe", TygerFramework::Warning);
-    }
-}
-
-void TygerFramework::LogMessage(std::string message, LogLevel logLevel) {
-    std::string logLevelString;
-    
-    if (mLogger.is_open())
-    {
-        switch (logLevel)
-        {
-        case TygerFramework::Info:
-            logLevelString = "[Info] ";
-            break;
-        case TygerFramework::Warning:
-            logLevelString = "[Warning] ";
-            break;
-        case TygerFramework::Error:
-            logLevelString = "[Error] ";
-            break;
-        default:
-            break;
-        }
-        mLogger << logLevelString << message << std::endl;
-        std::cout << logLevelString << message << std::endl;
-    }
-    else {
-        std::ofstream outfile("LoggerErrors.txt");
-        
-        outfile << "Error Logger Isn't Running!" << std::endl;
-        
-        outfile.close();
+        LogMessage("[TygerFramework] Unable to detect which Ty game is running from the exe", Warning);
     }
 }
 

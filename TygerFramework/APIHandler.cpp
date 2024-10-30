@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "APIHandler.h"
 #include "TygerFramework.h"
+#include "Logger.h"
 
 std::shared_ptr<APIHandler>& APIHandler::Get()
 {
@@ -16,7 +17,7 @@ void APIHandler::DrawPluginUI()
 			params.Function();
 		}
 		catch (...) {
-			FrameworkInstance->LogMessage("[API Handler] " + params.PluginName + " had an error occur when running plugin draw UI", TygerFramework::Error);
+			Logger::LogMessage("[API Handler] " + params.PluginName + " had an error occur when running plugin draw UI", Error);
 		}
 	}
 }
@@ -38,7 +39,7 @@ bool APIHandler::PluginImGuiWantCaptureMouse()
 			}
 		}
 		catch (...) {
-			FrameworkInstance->LogMessage("[API Handler] " + pluginName + " had an error occur while checking plugin imgui focus", TygerFramework::Error);
+			Logger::LogMessage("[API Handler] " + pluginName + " had an error occur while checking plugin imgui focus", Error);
 		}
 	}
 	return anyTrue;
@@ -67,7 +68,7 @@ bool APIHandler::PluginWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 				if (!FrameworkInstance->PluginLoader.mPluginWarnings.contains(params.PluginName))
 				{
 					FrameworkInstance->PluginLoader.mPluginWarnings.emplace(params.PluginName, "No ImGui WantMouseCapture API funciton");
-					FrameworkInstance->LogMessage("[API Handler] " + params.PluginName + " doesn't impliment the imgui WantMouseCapture API function", TygerFramework::Warning);
+					Logger::LogMessage("[API Handler] " + params.PluginName + " doesn't impliment the imgui WantMouseCapture API function", Warning);
 				}
 			}
 			//Use if the plugin wants to capture the mouse here to fix a bug with the resizing cursor change
@@ -78,7 +79,7 @@ bool APIHandler::PluginWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 				}
 		}
 		catch (...) {
-			FrameworkInstance->LogMessage("[API Handler] " + params.PluginName + " had an error occur when running plugin WndProc", TygerFramework::Error);
+			Logger::LogMessage("[API Handler] " + params.PluginName + " had an error occur when running plugin WndProc", Error);
 		}
 	}
 	return anyTrue;
@@ -98,7 +99,7 @@ void APIHandler::TickBeforeGame(float deltaSeconds)
 			params.Function(deltaSeconds);
 		}
 		catch (...) {
-			FrameworkInstance->LogMessage("[API Handler] " + params.PluginName + " had an error occur when running plugin tick before game", TygerFramework::Error);
+			Logger::LogMessage("[API Handler] " + params.PluginName + " had an error occur when running plugin tick before game", Error);
 		}
 	}
 }
@@ -115,7 +116,7 @@ void APIHandler::OnTyInitialized()
 			params.Function();
 		}
 		catch (...) {
-			FrameworkInstance->LogMessage("[API Handler] Had an error occur when notifying " + params.PluginName + " that Ty had initialized", TygerFramework::Error);
+			Logger::LogMessage("[API Handler] Had an error occur when notifying " + params.PluginName + " that Ty had initialized", Error);
 		}
 	}
 }
@@ -132,7 +133,7 @@ void APIHandler::OnTyBeginShutdown()
 			params.Function();
 		}
 		catch (...) {
-			FrameworkInstance->LogMessage("[API Handler] Had an error occur when notifying " + params.PluginName + " that Ty had begun shutting down", TygerFramework::Error);
+			Logger::LogMessage("[API Handler] Had an error occur when notifying " + params.PluginName + " that Ty had begun shutting down", Error);
 		}
 	}
 }
