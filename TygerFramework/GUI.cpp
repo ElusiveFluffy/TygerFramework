@@ -22,7 +22,7 @@ GetKeyboardState_t Original_GetKeyboardState;
 
 BOOL WINAPI SetCursorPosHook(int X, int Y) {
 	//Unlock the cursor from the center of the screen (for when the game locks it)
-	if (GUI::DrawGUI)
+	if (FrameworkInstance->PluginLoader.TyInputCombinedFlags & TyShowCursor)
 		return 1;
 
 	return Original_SetCursorPos(X, Y);
@@ -126,9 +126,8 @@ bool GUI::Init() {
 	ImGui_ImplWin32_InitForOpenGL(FrameworkInstance->TyWindowHandle);
 	ImGui_ImplOpenGL3_Init();
 
-	//Don't set it to false here or it breaks and never shows the cursor
 	if (GUI::DrawGUI)
-		ShowCursor(true);
+		FrameworkInstance->PluginLoader.SetTyInputState("TygerFramework", TyShowCursor);
 
 	Initialized = true;
 	return true;
@@ -165,15 +164,14 @@ void GUI::Draw() {
 		APIHandler::Get()->TickBeforeGame(1.0f / LastFrameFPS);
 
 	//Check if any imgui windows are focused for the mouse click hook
-	//NoMouseInput is 1, and None is 0, so can just cast the bool to avoid a if
 	bool blockMouseInput = APIHandler::Get()->PluginImGuiWantCaptureMouse() || (GUI::DrawGUI && (ImGui::GetIO().WantCaptureMouse || !FrameworkInstance->InputPassthrough));
-	FrameworkInstance->PluginLoader.SetTyBlockedInputs("TygerFramework", (TyBlockedInputsFlags)blockMouseInput);
+	FrameworkInstance->SetTyInputFlag(NoMouseClickInput, blockMouseInput);
+	FrameworkInstance->SetTyInputFlag(NoMouseCameraInput, GUI::DrawGUI);
 
 	//Draw ImGui windows
 	if (GUI::DrawGUI) {
 		//Draw all the plugin windows
 		APIHandler::Get()->DrawPluginUI();
-
 		//Set the window size once, just to update it to make sure its not too small
 		//when using the saved size and cutting off options when there is more options added
 		ImGui::SetNextWindowSize(ImVec2(285, 240), ImGuiCond_::ImGuiCond_Once);
@@ -220,10 +218,10 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		//Toggle ImGui
 		if (msg == WM_KEYDOWN && wParam == VK_F1) {
 			GUI::DrawGUI = !GUI::DrawGUI;
-			ShowCursor(GUI::DrawGUI);
+			FrameworkInstance->PluginLoader.SetTyInputState("TygerFramework", FrameworkInstance->PluginLoader.GetPluginTyInputFlags()["TygerFramework"] ^ TyShowCursor);
 		}
 		//Stop the game from registering mouse movement for the camera when the GUI is open or no mouse input allowed
-		else if (msg == WM_INPUT && (GUI::DrawGUI || FrameworkInstance->PluginLoader.TyInputCombinedFlags & NoMouseCameraInput))
+		else if (msg == WM_INPUT && FrameworkInstance->PluginLoader.TyInputCombinedFlags & NoMouseCameraInput)
 			return true;
 
 		//Only run when the GUI is shown (so it doesn't unfocus the imgui window when its hidden)

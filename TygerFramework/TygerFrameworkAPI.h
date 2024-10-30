@@ -42,15 +42,16 @@ enum TyFImGuiElements {
 };
 
 //Flags to block Ty from receiving inputs like mouse clicks
-enum TyBlockedInputsFlags {
+enum TyInputsFlags {
 	None = 0,
 	NoMouseClickInput = 1 << 0,
 	NoMouseCameraInput = 1 << 1,
 	NoKeyboardInput = 1 << 2,
+	TyShowCursor = 1 << 3,
 
 	NoMouseInput = NoMouseClickInput | NoMouseCameraInput
 };
-DEFINE_ENUM_FLAG_OPERATORS(TyBlockedInputsFlags)
+DEFINE_ENUM_FLAG_OPERATORS(TyInputsFlags)
 
 typedef struct {
 	TyFImGuiElements ImGuiElement;
@@ -86,8 +87,8 @@ typedef struct {
 	//v1.1.0
 	bool (*AddOnTyInitialized)(std::string, VoidFunc);
 	bool (*AddOnTyBeginShutdown)(std::string, VoidFunc);
-	bool (*SetTyBlockedInputs)(std::string pluginName, TyBlockedInputsFlags flags);
-	TyBlockedInputsFlags (*GetTyBlockedInputState)(std::string pluginName);
+	bool (*SetTyInputState)(std::string pluginName, TyInputsFlags flags);
+	TyInputsFlags (*GetTyInputState)(std::string pluginName);
 	std::filesystem::path (*GetPluginDir)();
 }TygerFrameworkPluginFunctions;
 

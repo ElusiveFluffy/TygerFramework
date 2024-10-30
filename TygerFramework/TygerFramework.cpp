@@ -320,3 +320,11 @@ bool TygerFramework::HookTyShutdown()
     LogMessage("[Ty Shutdown Hook] Sucessfully Hooked the Ty Shutdown Function");
     return true;
 }
+
+bool TygerFramework::SetTyInputFlag(TyInputsFlags flag, bool enableFlag)
+{
+    if (enableFlag)
+        return PluginLoader.SetTyInputState("TygerFramework", (PluginLoader.GetPluginTyInputFlags()["TygerFramework"] | flag));
+    else
+        return PluginLoader.SetTyInputState("TygerFramework", (PluginLoader.GetPluginTyInputFlags()["TygerFramework"] & ~flag));
+}

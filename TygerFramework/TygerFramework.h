@@ -21,10 +21,13 @@ public:
 	void LogMessage(std::string message, LogLevel errorType = Info);
 	void Shutdown();
 
+	bool SetTyInputFlag(TyInputsFlags flag, bool enableFlag);
+
 	void ToggleConsoleVisibility();
 
 	void CheckIfGameFinishInit();
 	bool TyHasInitialized;
+	bool CursorShown;
 
 	//UI Settings
 	bool ShowConsole;

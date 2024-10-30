@@ -33,8 +33,8 @@ TygerFrameworkPluginFunctions pluginFunctions{
     TygerFrameworkTickBeforeGame,
     TygerFrameworkOnTyInitialized,
     TygerFrameworkOnTyBeginShutdown,
-    PluginSetTyBlockedInputProxy,
-    GetPluginsTyBlockedInputState,
+    PluginSetTyInputStateProxy,
+    GetPluginsTyInputState,
     TygerFramework::GetPluginDir
 };
 
@@ -398,24 +398,24 @@ void PluginLoader::PluginDrawInTygerFrameworkWindow()
     }
 }
 
-bool PluginSetTyBlockedInputProxy(std::string pluginName, TyBlockedInputsFlags flags) {
-    return FrameworkInstance->PluginLoader.SetTyBlockedInputs(pluginName, flags);
+bool PluginSetTyInputStateProxy(std::string pluginName, TyInputsFlags flags) {
+    return FrameworkInstance->PluginLoader.SetTyInputState(pluginName, flags);
 }
 
-TyBlockedInputsFlags GetPluginsTyBlockedInputState(std::string pluginName)
+TyInputsFlags GetPluginsTyInputState(std::string pluginName)
 {
     return FrameworkInstance->PluginLoader.GetPluginTyInputFlags()[pluginName];
 }
 
 //Blocker name is the one who wants to block input, for plugins it'll be the plugin name, but TygerFramework also uses this
-bool PluginLoader::SetTyBlockedInputs(std::string blockerName, TyBlockedInputsFlags flags)
+bool PluginLoader::SetTyInputState(std::string blockerName, TyInputsFlags flags)
 {
     mPluginTyInputFlags.insert_or_assign(blockerName, flags);
-    CombineTyBlockedInputs();
+    CombineTyInputState();
     return true;
 }
 
-void PluginLoader::CombineTyBlockedInputs()
+void PluginLoader::CombineTyInputState()
 {
     //Reset the flags first
     TyInputCombinedFlags = None;

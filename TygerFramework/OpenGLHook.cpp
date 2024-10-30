@@ -20,6 +20,13 @@ BOOL WINAPI wglSwapBuffers_Func(HDC hDC) {
 	if ((IsWindowVisible(GetConsoleWindow()) == TRUE) != FrameworkInstance->ShowConsole)
 		FrameworkInstance->ToggleConsoleVisibility();
 
+	//To make sure its not set to false twice, otherwise it'll never show again even if this is set to true
+	if ((FrameworkInstance->PluginLoader.TyInputCombinedFlags & TyShowCursor) == TyShowCursor != FrameworkInstance->CursorShown) {
+		//Flip the variable and set it
+		FrameworkInstance->CursorShown = !FrameworkInstance->CursorShown;
+		ShowCursor(FrameworkInstance->CursorShown);
+	}
+
 	//Run the original function
 	return Original_wglSwapBuffers(hDC);
 }

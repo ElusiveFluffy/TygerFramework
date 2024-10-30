@@ -13,8 +13,8 @@ void PluginSetTygerFrameworkImGuiElements(std::string pluginName, std::vector<Ty
 bool TygerFrameworkTickBeforeGame(std::string pluginName, TickBeforeGameFunc func);
 bool TygerFrameworkOnTyInitialized(std::string pluginName, VoidFunc func);
 bool TygerFrameworkOnTyBeginShutdown(std::string pluginName, VoidFunc func);
-bool PluginSetTyBlockedInputProxy(std::string pluginName, TyBlockedInputsFlags flags);
-TyBlockedInputsFlags GetPluginsTyBlockedInputState(std::string pluginName);
+bool PluginSetTyInputStateProxy(std::string pluginName, TyInputsFlags flags);
+TyInputsFlags GetPluginsTyInputState(std::string pluginName);
 
 class PluginLoader
 {
@@ -26,12 +26,12 @@ public:
 	std::map<std::string, std::vector<TygerFrameworkImGuiParam>> PluginImGuiElements{};
 	std::map<std::string, std::string> mPluginWarnings{};
 
-	std::map<std::string, TyBlockedInputsFlags>& GetPluginTyInputFlags() { return mPluginTyInputFlags; };
-	bool SetTyBlockedInputs(std::string blockerName, TyBlockedInputsFlags flags);
-	TyBlockedInputsFlags TyInputCombinedFlags = None;
+	std::map<std::string, TyInputsFlags>& GetPluginTyInputFlags() { return mPluginTyInputFlags; };
+	bool SetTyInputState(std::string blockerName, TyInputsFlags flags);
+	TyInputsFlags TyInputCombinedFlags = None;
 
 private:
-	void CombineTyBlockedInputs();
+	void CombineTyInputState();
 	void PluginEarlyInit();
 	void DependencyInit();
 
@@ -41,6 +41,6 @@ private:
 	std::map<std::string, HMODULE> mDependencies{};
 	std::map<std::string, std::string> mDependencyErrors{};
 	//Just so each plugin can be kept track of without needing to have a check every frame for what input they want
-	std::map<std::string, TyBlockedInputsFlags> mPluginTyInputFlags{};
+	std::map<std::string, TyInputsFlags> mPluginTyInputFlags{};
 };
 
