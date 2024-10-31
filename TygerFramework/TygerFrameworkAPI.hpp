@@ -131,7 +131,7 @@ public:
 		return Get()->param()->functions->AddTickBeforeGame(PluginName, func);
 	}
 
-	static bool AddOnTyInitialize(VoidFunc func) {
+	static bool AddOnTyInitialized(VoidFunc func) {
 		return Get()->param()->functions->AddOnTyInitialized(PluginName, func);
 	}
 
