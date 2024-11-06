@@ -166,7 +166,7 @@ void GUI::Draw() {
 
 	//Check if any imgui windows are focused for the mouse click hook
 	bool blockMouseInput = APIHandler::Get()->PluginImGuiWantCaptureMouse() || (GUI::DrawGUI && (ImGui::GetIO().WantCaptureMouse || !FrameworkInstance->InputPassthrough));
-	FrameworkInstance->SetTyInputFlag(NoMouseClickInput, blockMouseInput);
+	FrameworkInstance->SetTyInputFlag(NoMouseClickInput, blockMouseInput && GUI::DrawGUI);
 	FrameworkInstance->SetTyInputFlag(NoMouseCameraInput, GUI::DrawGUI);
 
 	//Draw ImGui windows
