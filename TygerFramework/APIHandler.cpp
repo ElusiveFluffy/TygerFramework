@@ -16,6 +16,11 @@ void APIHandler::DrawPluginUI()
 		try {
 			params.Function();
 		}
+		catch (const std::exception& e) {
+			std::string message = "[API Handler] " + params.PluginName + " had an error occur when running plugin draw UI: ";
+			message += e.what();
+			Logger::LogMessage(message, Error);
+		}
 		catch (...) {
 			Logger::LogMessage("[API Handler] " + params.PluginName + " had an error occur when running plugin draw UI", Error);
 		}
@@ -37,6 +42,11 @@ bool APIHandler::PluginImGuiWantCaptureMouse()
 			if (function()) {
 				anyTrue = true;
 			}
+		}
+		catch (const std::exception& e) {
+			std::string message = "[API Handler] " + pluginName + " had an error occur while checking plugin imgui focus: ";
+			message += e.what();
+			Logger::LogMessage(message, Error);
 		}
 		catch (...) {
 			Logger::LogMessage("[API Handler] " + pluginName + " had an error occur while checking plugin imgui focus", Error);
@@ -78,6 +88,11 @@ bool APIHandler::PluginWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam
 					anyTrue = true;
 				}
 		}
+		catch (const std::exception& e) {
+			std::string message = "[API Handler] " + params.PluginName + " had an error occur when running plugin WndProc: ";
+			message += e.what();
+			Logger::LogMessage(message, Error);
+		}
 		catch (...) {
 			Logger::LogMessage("[API Handler] " + params.PluginName + " had an error occur when running plugin WndProc", Error);
 		}
@@ -98,6 +113,11 @@ void APIHandler::TickBeforeGame(float deltaSeconds)
 		try {
 			params.Function(deltaSeconds);
 		}
+		catch (const std::exception& e) {
+			std::string message = "[API Handler] " + params.PluginName + " had an error occur when running plugin tick before game: ";
+			message += e.what();
+			Logger::LogMessage(message, Error);
+		}
 		catch (...) {
 			Logger::LogMessage("[API Handler] " + params.PluginName + " had an error occur when running plugin tick before game", Error);
 		}
@@ -115,6 +135,11 @@ void APIHandler::OnTyInitialized()
 		try {
 			params.Function();
 		}
+		catch (const std::exception& e) {
+			std::string message = "[API Handler] Had an error occur when notifying " + params.PluginName + " that Ty had initialized: ";
+			message += e.what();
+			Logger::LogMessage(message, Error);
+		}
 		catch (...) {
 			Logger::LogMessage("[API Handler] Had an error occur when notifying " + params.PluginName + " that Ty had initialized", Error);
 		}
@@ -131,6 +156,11 @@ void APIHandler::OnTyBeginShutdown()
 	for (auto&& params : mOnTyBeginShutdownParams) {
 		try {
 			params.Function();
+		}
+		catch (const std::exception& e) {
+			std::string message = "[API Handler] Had an error occur when notifying " + params.PluginName + " that Ty had begun shutting down: ";
+			message += e.what();
+			Logger::LogMessage(message, Error);
 		}
 		catch (...) {
 			Logger::LogMessage("[API Handler] Had an error occur when notifying " + params.PluginName + " that Ty had begun shutting down", Error);
