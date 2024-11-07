@@ -342,11 +342,17 @@ void PluginSetTygerFrameworkImGuiElements(std::string pluginName, std::vector<Ty
 void PluginLoader::PluginDrawInTygerFrameworkWindow()
 {
     for (auto&& [pluginName, elements] : PluginImGuiElements) {
-        bool headerCollapsed = false;
+        std::vector<bool> headerCollapsed{};
         for (TygerFrameworkImGuiParam param : elements) {
             //Allows for multiple collapsing headers
-            if (headerCollapsed && param.ImGuiElement != CollapsingHeader)
+            if (param.ImGuiElement != CollapsingHeaderEnd && headerCollapsed.size() > 0 && headerCollapsed.back())
+            {
+                //Check if the header is inside of the header
+                if (param.ImGuiElement == CollapsingHeader)
+                    //Add a collapsed header value as this is unseen
+                    headerCollapsed.push_back(true);
                 continue;
+            }
             switch (param.ImGuiElement) {
             case CollapsingHeader:
                 //Return it if the text is blank
@@ -356,7 +362,14 @@ void PluginLoader::PluginDrawInTygerFrameworkWindow()
                 }
 
                 //Check if its closed
-                headerCollapsed = !ImGui::CollapsingHeader(param.Text.c_str());
+                headerCollapsed.push_back(!ImGui::CollapsingHeader(param.Text.c_str()));
+                break;
+            case CollapsingHeaderEnd:
+                if (headerCollapsed.size() == 0) {
+                    Logger::LogMessage("[" + pluginName + "]" + " Error, Not Enough CollapsingHeader TygerFramework ImGui Elements Were Added Before Calling CollapsingHeaderEnd!", Error);
+                    continue;
+                }
+                headerCollapsed.pop_back();
                 break;
             case Text:
                 ImGui::Text(param.Text.c_str());

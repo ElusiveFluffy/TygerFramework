@@ -38,7 +38,8 @@ enum TyFImGuiElements {
 	Spacing, //No text
 	SetTooltip, //Needs text for tooltip (Adds a tooltip to the previous element)
 	TreePush, //Needs texts for tree name
-	TreePop //No text (Make sure to call when done after using TreePush)
+	TreePop, //No text (Make sure to call when done after using TreePush)
+	CollapsingHeaderEnd //No text (Not a real ImGUI element but it is needed for this)
 };
 
 //Flags to block Ty from receiving inputs like mouse clicks
