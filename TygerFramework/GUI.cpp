@@ -145,7 +145,7 @@ void GUI::SetImGuiStyle() {
 	fonts->Build();
 }
 
-float LastFrameFPS = 0;
+float LastFrameFPS = 60; //Just default to 60 to avoid a potential divide by zero error (usually happens sometimes on startup with Ty 2/3)
 
 void GUI::Draw() {
 
