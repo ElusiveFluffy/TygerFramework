@@ -3,6 +3,7 @@
 #include <iostream>
 #include <filesystem>
 #include <fstream>
+#include <format>
 #include "MinHook.h"
 #include "OpenGLHook.h"
 #include "GUI.h"
@@ -56,6 +57,9 @@ TygerFramework::TygerFramework(HMODULE TyHModule)
     Logger::StartLogger();
     CreateConsole();
     LogMessage("[TygerFramework] Logger Started");
+    LogMessage(std::format("[TygerFramework] TygerFramework v{}.{}.{}", TygerFrameworkPluginVersion_Major, 
+                                                                        TygerFrameworkPluginVersion_Minor, 
+                                                                        TygerFrameworkPluginVersion_Patch));
     LoadSettings();
 
     if (fs::exists("steam_appid.txt"))
