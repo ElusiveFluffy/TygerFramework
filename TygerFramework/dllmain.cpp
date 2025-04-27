@@ -5,8 +5,6 @@
 #include <iostream>
 #include <fstream>
 #include <filesystem>
-//Make it use xinput 9.1.0
-#define _WIN32_WINNT 0x0500
 #include <Xinput.h>
 namespace fs = std::filesystem;
 
@@ -32,11 +30,7 @@ bool Load_XInput9_1_0() {
 }
 
 //XInputSetState wrapper for xinput9.1.0.dll
-EXTERN_C DWORD xinput_set_state(DWORD dwUserIndex, XINPUT_VIBRATION* pVibration) {
-    //This needs to be done because when we include xinput.h,
-    //It is a redefinition, so we assign an export by not using the original name
-    #pragma comment(linker, "/EXPORT:XInputSetState=xinput_set_state")
-
+EXTERN_C DWORD WINAPI xinput_set_state(DWORD dwUserIndex, XINPUT_VIBRATION* pVibration) {
     //Make sure its loaded
     Load_XInput9_1_0();
     return ((decltype(XInputSetState)*)GetProcAddress(pXInput, "XInputSetState"))(dwUserIndex, pVibration);
@@ -44,10 +38,6 @@ EXTERN_C DWORD xinput_set_state(DWORD dwUserIndex, XINPUT_VIBRATION* pVibration)
 
 //XInputGetState wrapper for xinput9.1.0.dll
 EXTERN_C DWORD WINAPI xinput_get_state(DWORD dwUserIndex, XINPUT_STATE* pState) {
-    //This needs to be done because when we include xinput.h,
-    //It is a redefinition, so we assign an export by not using the original name
-    #pragma comment(linker, "/EXPORT:XInputGetState=xinput_get_state")
-
     //Make sure its loaded
     Load_XInput9_1_0();
     return ((decltype(XInputGetState)*)GetProcAddress(pXInput, "XInputGetState"))(dwUserIndex, pState);
