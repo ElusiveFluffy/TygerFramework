@@ -17,15 +17,15 @@ public:
 	void ToggleConsoleVisibility();
 
 	void CheckIfGameFinishInit();
-	bool TyHasInitialized;
-	bool CursorShown;
+	bool TyHasInitialized = false;
+	bool CursorShown = false;
 
 	//UI Settings
-	bool ShowConsole;
-	bool TyLogInConsole;
+	bool ShowConsole = false;
+	bool TyLogInConsole = false;
 	bool RememberVisibility = true;
 	bool InputPassthrough = true;
-	bool KeyboardAlwaysPassthrough;
+	bool KeyboardAlwaysPassthrough = false;
 
 	HWND TyWindowHandle;
 

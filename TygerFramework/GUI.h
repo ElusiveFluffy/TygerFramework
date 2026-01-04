@@ -1,8 +1,8 @@
 #pragma once
 namespace GUI
 {
-	inline bool Initialized;
-	inline bool ImGuiWindowFocused;
+	inline bool Initialized = false;
+	inline bool ImGuiWindowFocused = false;
 	inline bool DrawGUI = true;
 	static float FontSize = 16;
 

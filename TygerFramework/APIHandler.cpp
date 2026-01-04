@@ -3,10 +3,10 @@
 #include "TygerFramework.h"
 #include "Logger.h"
 
-std::shared_ptr<APIHandler>& APIHandler::Get()
+APIHandler* APIHandler::Get()
 {
 	static auto instance = std::make_shared<APIHandler>();
-	return instance;
+	return instance.get();
 }
 
 //Run all the UI code for subscribed plugins

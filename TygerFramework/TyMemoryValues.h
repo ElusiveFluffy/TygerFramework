@@ -12,5 +12,5 @@ namespace TyMemoryValues
 	uint32_t* GetPointerAddress(uint32_t* baseAddress, uint32_t offset);
 	LPVOID* GetTyShutdownFunc();
 
-	inline char VersionText[50];
+	inline char VersionText[50]{};
 };

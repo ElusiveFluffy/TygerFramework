@@ -3,33 +3,33 @@
 #include <functional>
 #include <string>
 #include <memory>
-#include <map>
+#include <unordered_map>
 
 class APIHandler
 {
 public:
-	static std::shared_ptr<APIHandler>& Get();
+	static APIHandler* Get();
 
-	typedef struct {
+	struct VoidFunctionParam {
 		std::string PluginName;
 		std::function<void()> Function;
-	}VoidFunctionParam;
+	};
 
-	typedef struct {
+	struct PluginWantCaptureMouseParam {
 		std::string PluginName;
 		std::function<bool()> Function;
-	}PluginWantCaptureMouseParam;
+	};
 
 	using TyFPluginWndProc = std::function<bool(HWND, UINT, WPARAM, LPARAM)>;
-	typedef struct {
+	struct PluginWndProcParam {
 		std::string PluginName;
 		TyFPluginWndProc Function;
-	}PluginWndProcParam;
+	};
 
-	typedef struct {
+	struct TickBeforeGameParam {
 		std::string PluginName;
 		std::function<void(float deltaSeconds)> Function;
-	}TickBeforeGameParam;
+	};
 
 	//Draw Plugin UI
 	void DrawPluginUI();
@@ -57,7 +57,7 @@ public:
 private:
 	//Stored Functions
 	std::vector<VoidFunctionParam> mDrawPluginUIParams{};
-	std::map<std::string, std::function<bool()>> mPluginImGuiWantCaptureMouseParams{};
+	std::unordered_map<std::string, std::function<bool()>> mPluginImGuiWantCaptureMouseParams{};
 	std::vector<PluginWndProcParam> mPluginWndProcParams{};
 	std::vector<TickBeforeGameParam> mTickBeforeGameParams{};
 	std::vector<VoidFunctionParam> mOnTyInitializedParams{};

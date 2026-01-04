@@ -1,5 +1,6 @@
 #pragma once
 #include <map>
+#include <unordered_map>
 #include <string>
 #include "TygerFrameworkAPI.hpp"
 
@@ -26,7 +27,7 @@ public:
 	std::map<std::string, std::vector<TygerFrameworkImGuiParam>> PluginImGuiElements{};
 	std::map<std::string, std::string> mPluginWarnings{};
 
-	std::map<std::string, TyInputsFlags>& GetPluginTyInputFlags() { return mPluginTyInputFlags; };
+	std::unordered_map<std::string, TyInputsFlags>& GetPluginTyInputFlags() { return mPluginTyInputFlags; };
 	bool SetTyInputState(std::string blockerName, TyInputsFlags flags);
 	TyInputsFlags TyInputCombinedFlags = None;
 
@@ -41,6 +42,6 @@ private:
 	std::map<std::string, HMODULE> mDependencies{};
 	std::map<std::string, std::string> mDependencyErrors{};
 	//Just so each plugin can be kept track of without needing to have a check every frame for what input they want
-	std::map<std::string, TyInputsFlags> mPluginTyInputFlags{};
+	std::unordered_map<std::string, TyInputsFlags> mPluginTyInputFlags{};
 };
 
