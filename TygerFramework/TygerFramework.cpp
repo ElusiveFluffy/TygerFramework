@@ -99,8 +99,7 @@ TygerFramework::TygerFramework(HMODULE TyHModule)
         TyMemoryValues::TyBaseAddress = (DWORD)mTyHModule;
         LogMessage("[TygerFramework] Got Ty Base Address");
 
-        if (TyGame == 1)
-            TyMemoryValues::SetTy1VersionText();
+        TyMemoryValues::SetVersionText(TyGame);
     }
     else
         LogMessage("[TygerFramework] Couldn't get Ty base address", Error);

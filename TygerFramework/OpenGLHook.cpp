@@ -2,6 +2,7 @@
 #include "OpenGLHook.h"
 #include "MinHook.h"
 #include "TygerFramework.h"
+#include "TyMemoryValues.h"
 #include "Logger.h"
 #include "GUI.h"
 
@@ -16,6 +17,10 @@ BOOL WINAPI wglSwapBuffers_Func(HDC hDC) {
 		GUI::Init();
 	else
 		GUI::Draw();
+
+	// Just keep calling this, because if you load a save file 
+	// then go back to the main menu the text gets reallocated and it needs to be set again
+	TyMemoryValues::SetTy2And3VersionTextSpace();
 
 	//If the checkbox value is different than the visibility, toggle the console
 	if ((IsWindowVisible(GetConsoleWindow()) == TRUE) != FrameworkInstance->ShowConsole)
