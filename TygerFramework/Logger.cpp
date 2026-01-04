@@ -25,7 +25,7 @@ std::string Logger::GetTimeStamp()
 }
 
 void Logger::LogMessage(std::string message, LogLevel logLevel) {
-    std::string logLevelString;
+    std::string logLevelString = "";
 
     if (mLogger.is_open())
     {
@@ -33,7 +33,6 @@ void Logger::LogMessage(std::string message, LogLevel logLevel) {
         {
         case Info:
             SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
-            logLevelString = "[Info] ";
             break;
         case Warning:
             SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
@@ -49,6 +48,8 @@ void Logger::LogMessage(std::string message, LogLevel logLevel) {
         std::string timeStamp = GetTimeStamp();
         mLogger << timeStamp << logLevelString << message << std::endl;
         std::cout << timeStamp << logLevelString << message << std::endl;
+        // Reset it back to white afterwards, otherwise Ty logs could have the warning or error colour
+        SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
     }
     else {
         std::ofstream outfile("LoggerErrors.txt");
