@@ -4,7 +4,7 @@
 #include "MinHook.h"
 #include "Logger.h"
 #include "APIHandler.h"
-#include "TygerFrameworkAPI.h"
+#include "TygerFrameworkAPI.hpp"
 #include <format>
 
 #include "Fonts/RobotoMedium.hpp"

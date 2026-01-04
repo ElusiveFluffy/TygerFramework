@@ -48,9 +48,6 @@
     <ClInclude Include="TygerFramework.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TygerFrameworkAPI.h">
-      <Filter>Header Files\API</Filter>
-    </ClInclude>
     <ClInclude Include="TygerFrameworkAPI.hpp">
       <Filter>Header Files\API</Filter>
     </ClInclude>
