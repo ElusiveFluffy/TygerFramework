@@ -32,12 +32,15 @@ void Logger::LogMessage(std::string message, LogLevel logLevel) {
         switch (logLevel)
         {
         case Info:
+            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
             logLevelString = "[Info] ";
             break;
         case Warning:
+            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
             logLevelString = "[Warning] ";
             break;
         case Error:
+            SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED | FOREGROUND_INTENSITY);
             logLevelString = "[Error] ";
             break;
         default:
