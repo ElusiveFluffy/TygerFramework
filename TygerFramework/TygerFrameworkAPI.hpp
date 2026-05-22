@@ -240,6 +240,8 @@ public:
 	}
 
 private:
-	static inline std::unique_ptr<API> mInstance;
+	static std::unique_ptr<API> mInstance;
 	const TygerFrameworkPluginInitializeParam* mParam;
 };
+
+inline std::unique_ptr<API> API::mInstance;
