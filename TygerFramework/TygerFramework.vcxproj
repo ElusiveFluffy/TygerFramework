@@ -192,6 +192,7 @@
     <ClInclude Include="Include\ini.h" />
     <ClInclude Include="OpenGLHook.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="PluginFunctionsC.h" />
     <ClInclude Include="PluginLoader.h" />
     <ClInclude Include="TygerFramework.h" />
     <ClInclude Include="TyMemoryValues.h" />
@@ -215,6 +216,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="PluginFunctionsC.cpp" />
     <ClCompile Include="PluginLoader.cpp" />
     <ClCompile Include="TygerFramework.cpp" />
     <ClCompile Include="TyMemoryValues.cpp" />

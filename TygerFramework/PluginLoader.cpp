@@ -9,6 +9,7 @@
 #include "Logger.h"
 #include "Fonts/RobotoMedium.hpp"
 #include "GUI.h"
+#include "PluginFunctionsC.h"
 namespace fs = std::filesystem;
 
 namespace tygerFramework {
@@ -162,20 +163,23 @@ void PluginLoader::Initialize() {
     for (auto plugins = mPlugins.begin(); plugins != mPlugins.end();) {
         std::string pluginName = plugins->first;
         HMODULE pluginModule = plugins->second;
-        auto pluginRequiredVersionFunc = (TyFPluginRequiredVersion)GetProcAddress(pluginModule, "TygerFrameworkPluginRequiredVersion");
-
-        //If the plugin doesn't implement the function it just skip it
-        if (pluginRequiredVersionFunc == nullptr) {
-            Logger::LogMessage("[Plugin Loader] " + pluginName + " Doesn't Have a TygerFrameworkPluginRequiredVersion Function, Skipping");
-
-            ++plugins;
-            continue;
-        }
-
         TygerFrameworkPluginVersion requiredVersion{};
 
         try {
-            pluginRequiredVersionFunc(&requiredVersion);
+            //Prefer the toolchain-independent C entry point; fall back to the C++ one.
+            if (!PluginC_TryGetRequiredVersion(pluginModule, requiredVersion)) {
+                auto pluginRequiredVersionFunc = (TyFPluginRequiredVersion)GetProcAddress(pluginModule, "TygerFrameworkPluginRequiredVersion");
+
+                //If the plugin doesn't implement the function it just skip it
+                if (pluginRequiredVersionFunc == nullptr) {
+                    Logger::LogMessage("[Plugin Loader] " + pluginName + " Doesn't Have a TygerFrameworkPluginRequiredVersion Function, Skipping");
+
+                    ++plugins;
+                    continue;
+                }
+
+                pluginRequiredVersionFunc(&requiredVersion);
+            }
         }
         catch (...) {
             Logger::LogMessage("[Plugin Loader] " + pluginName + "Had An Exception Occur In TygerFrameworkPluginRequiredVersion, Skipping", Error);
@@ -228,22 +232,33 @@ void PluginLoader::Initialize() {
     for (auto plugins = mPlugins.begin(); plugins != mPlugins.end();) {
         std::string pluginName = plugins->first;
         HMODULE pluginModule = plugins->second;
-        auto pluginInitializer = (TyFPluginInitializer)GetProcAddress(pluginModule, "TygerFrameworkPluginInitialize");
-
-        //Skip the plugin if it doesn't have the function
-        if (pluginInitializer == nullptr) {
-            ++plugins;
-            continue;
-        }
-
-        pluginInitParam.pluginFileName = pluginName;
         Logger::LogMessage("[Plugin Loader] Initializing: " + pluginName);
         try {
-            if (!pluginInitializer(&pluginInitParam)) {
-                if (pluginInitParam.initErrorMessage != "")
+            bool initOk = false;
+            std::string initError;
+            //Prefer the toolchain-independent C entry point.
+            bool handledByC = PluginC_TryInitialize(pluginModule, FrameworkInstance->getFrameworkModule(),
+                                                     pluginName, initOk, initError);
+            if (!handledByC) {
+                auto pluginInitializer = (TyFPluginInitializer)GetProcAddress(pluginModule, "TygerFrameworkPluginInitialize");
+
+                //Skip the plugin if it doesn't have the function
+                if (pluginInitializer == nullptr) {
+                    ++plugins;
+                    continue;
+                }
+
+                pluginInitParam.pluginFileName = pluginName;
+                pluginInitParam.initErrorMessage = "";
+                initOk = pluginInitializer(&pluginInitParam);
+                initError = pluginInitParam.initErrorMessage;
+            }
+
+            if (!initOk) {
+                if (initError != "")
                 {
-                    Logger::LogMessage("[Plugin Loader] Failed to Initialize: " + pluginName + ", With the Error: " + pluginInitParam.initErrorMessage, Error);
-                    mPluginErrors.emplace(pluginName, "Failed to Initialize: " + pluginInitParam.initErrorMessage);
+                    Logger::LogMessage("[Plugin Loader] Failed to Initialize: " + pluginName + ", With the Error: " + initError, Error);
+                    mPluginErrors.emplace(pluginName, "Failed to Initialize: " + initError);
                 }
                 else
                 {
