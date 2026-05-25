@@ -12,7 +12,7 @@
 #include <windows.h>
 
 constexpr int TygerFrameworkPluginVersion_Major = 1;
-constexpr int TygerFrameworkPluginVersion_Minor = 3;
+constexpr int TygerFrameworkPluginVersion_Minor = 2;
 constexpr int TygerFrameworkPluginVersion_Patch = 0;
 
 struct TygerFrameworkPluginVersion {

@@ -18,7 +18,7 @@ You'll probably also need to edit the post build command to your Ty directory (i
 
 ## Toolchain-independent plugins (extern "C" surface)
 
-As of plugin API 1.3.0, plugins recompiled against `TygerFrameworkAPI.hpp` are
+As of plugin API 1.2.0, plugins recompiled against `TygerFrameworkAPI.hpp` are
 binary-compatible with TygerFramework regardless of the toolchain/STL they were
 built with (e.g. MinGW cross-compiles from Linux). The public `API` class is
 unchanged; only the plugin entry points change — declare them with one macro:
@@ -27,7 +27,7 @@ unchanged; only the plugin entry points change — declare them with one macro:
     bool MyInit(const TygerFrameworkPluginInitializeParam* p) { API::Initialize(p); /* ... */ return true; }
     TYGERFRAMEWORK_PLUGIN(MyVersion, MyInit)
 
-When recompiling an existing plugin against the 1.3.0 header you must switch its
+When recompiling an existing plugin against the 1.2.0 header you must switch its
 entry points to the `TYGERFRAMEWORK_PLUGIN` macro: the `API::` helper methods now
 route through the C surface, which the macro binds, and they will throw if it is
 not used.
