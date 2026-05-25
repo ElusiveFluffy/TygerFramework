@@ -4,6 +4,7 @@
 #include <memory>
 #include <stdexcept>
 #include <filesystem>
+#include <type_traits>
 
 //Needed for the WndProc inputs usually in precompiled headers but that needs to be turned off for imgui
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
@@ -11,7 +12,7 @@
 #include <windows.h>
 
 constexpr int TygerFrameworkPluginVersion_Major = 1;
-constexpr int TygerFrameworkPluginVersion_Minor = 2;
+constexpr int TygerFrameworkPluginVersion_Minor = 3;
 constexpr int TygerFrameworkPluginVersion_Patch = 0;
 
 struct TygerFrameworkPluginVersion {
@@ -104,6 +105,64 @@ struct TygerFrameworkPluginInitializeParam {
 	std::string initErrorMessage; //Error message that gets read by TygerFramework if the plugin can't initialize (returning false on initialize)
 };
 
+/**
+ * Optional C ABI surface (issue #2).
+ *
+ * POD/standard-layout mirror of the API. No STL types appear below, so plugins
+ * built with a different toolchain/STL than TygerFramework stay binary-compatible
+ * across the DLL boundary.
+ */
+
+/** C-ABI mirror of TygerFrameworkPluginVersion. */
+struct TygerFrameworkPluginVersionC {
+	int Major;             ///< Major version component.
+	int Minor;             ///< Minor version component.
+	int Patch;             ///< Patch version component.
+	int CompatibleGames;   ///< Bitmask: bit (n-1) set => compatible with Ty n; 0 => any game.
+};
+
+/** C-ABI mirror of TygerFrameworkImGuiParam. */
+struct TygerFrameworkImGuiParamC {
+	int ImGuiElement;   ///< A TyFImGuiElements value.
+	const char* Text;   ///< Borrowed only for the duration of the call.
+};
+
+/**
+ * C-ABI mirror of the plugin function table.
+ *
+ * Populated by the framework and reached through TygerFrameworkPluginInitializeParamC.
+ * The C++ API wrapper calls through these pointers, so plugin code normally uses the
+ * API:: static methods rather than invoking them directly.
+ */
+struct TygerFrameworkPluginFunctionsC {
+	void (*LogPluginMessage)(const char* message, int logLevel);
+	int  (*CurrentTyGame)();
+	bool (*AddDrawPluginUI)(const char* pluginName, VoidFunc func);
+	bool (*AddPluginImGuiWantCaptureMouse)(const char* pluginName, ImGuiWantCaptureMouseFunc func);
+	bool (*AddPluginWndProc)(const char* pluginName, WndProcFunc func);
+	HWND (*GetTyWindowHandle)();
+	bool (*DrawingGUI)();
+	void (*SetTyFImGuiElements)(const char* pluginName, const TygerFrameworkImGuiParamC* params, int count);
+	bool (*AddTickBeforeGame)(const char* pluginName, TickBeforeGameFunc func);
+	bool (*AddOnTyInitialized)(const char* pluginName, VoidFunc func);
+	bool (*AddOnTyBeginShutdown)(const char* pluginName, VoidFunc func);
+	bool (*SetTyInputState)(const char* pluginName, int flags);   ///< flags is a TyInputsFlags value.
+	int  (*GetTyInputState)(const char* pluginName);              ///< Returns a TyInputsFlags value.
+	const char* (*GetPluginDir)();   ///< Framework-owned, stable for the plugin lifetime (UTF-8).
+};
+
+/** C-ABI mirror of TygerFrameworkPluginInitializeParam, passed to the C init entry point. */
+struct TygerFrameworkPluginInitializeParamC {
+	void* TyHModule;                                   ///< Module handle of the running Ty game.
+	const char* pluginFileName;                        ///< Plugin file name (framework-owned).
+	const TygerFrameworkPluginFunctionsC* functions;   ///< The C function table.
+};
+
+static_assert(std::is_standard_layout_v<TygerFrameworkPluginVersionC>, "TygerFrameworkPluginVersionC must be standard-layout (C ABI)");
+static_assert(std::is_standard_layout_v<TygerFrameworkImGuiParamC>, "TygerFrameworkImGuiParamC must be standard-layout (C ABI)");
+static_assert(std::is_standard_layout_v<TygerFrameworkPluginFunctionsC>, "TygerFrameworkPluginFunctionsC must be standard-layout (C ABI)");
+static_assert(std::is_standard_layout_v<TygerFrameworkPluginInitializeParamC>, "TygerFrameworkPluginInitializeParamC must be standard-layout (C ABI)");
+
 typedef bool (*TyFPluginInitializer)(const TygerFrameworkPluginInitializeParam*);
 typedef void (*TyFPluginRequiredVersion)(TygerFrameworkPluginVersion*);
 
@@ -118,7 +177,19 @@ public:
 		return mInstance != nullptr;
 	}
 
-	//Call this when the TygerFramework Plugin Initialize export function gets called, 
+	/**
+	 * Framework-internal plumbing: binds the C function table.
+	 *
+	 * The TYGERFRAMEWORK_PLUGIN init shim calls this exactly once, before the
+	 * author's handler runs. The Internal suffix marks it internal; plugin
+	 * code must never call it directly (doing so would swap the active function
+	 * table mid-run).
+	 */
+	static void BindCInterfaceInternal(const TygerFrameworkPluginInitializeParamC* paramC) {
+		mCParam = paramC;
+	}
+
+	//Call this when the TygerFramework Plugin Initialize export function gets called,
 	//and before you call any other API functions.
 	static auto& Initialize(const TygerFrameworkPluginInitializeParam* param) {
 		if (param == nullptr) {
@@ -158,12 +229,12 @@ public:
 
 	//Gets the current Ty window handle
 	static HWND GetTyWindowHandle() {
-		return API::Get()->param()->functions->GetTyWindowHandle();
+		return CFunctions()->GetTyWindowHandle();
 	}
 
 	//Checks if TygerFramework is drawing the GUI
 	static bool DrawingGUI() {
-		return API::Get()->param()->functions->DrawingGUI();
+		return CFunctions()->DrawingGUI();
 	}
 
 	/// <summary>
@@ -174,41 +245,45 @@ public:
 	/// <para>2: Ty 2</para>
 	/// <para>3: Ty 3</para></returns>
 	static int CurrentTyGame() {
-		return Get()->param()->functions->CurrentTyGame();
+		return CFunctions()->CurrentTyGame();
 	}
 
 	//Gets the current plugin directory (will be different for debug/release builds of TygerFramework)
 	static std::filesystem::path GetPluginDirectory() {
-		return Get()->param()->functions->GetPluginDir();
+		return std::filesystem::path(CFunctions()->GetPluginDir());
 	}
 
 	//Writes a message to the console and the log file. Default log level is info
 	static void LogPluginMessage(std::string message, LogLevel logLevel = Info) {
-		Get()->param()->functions->LogPluginMessage("[" + mInstance->PluginName + "] " + message, logLevel);
+		CFunctions()->LogPluginMessage(("[" + mInstance->PluginName + "] " + message).c_str(), (int)logLevel);
 	}
 
 	//Sets the elements from the plugin that will be drawn below the plugin section in the TygerFramework ImGui window.
 	//Overwrites the old value if its called again
 	static void SetTygerFrameworkImGuiElements(std::vector<TygerFrameworkImGuiParam> elements) {
-		Get()->param()->functions->SetTyFImGuiElements(mInstance->PluginName, elements);
+		std::vector<TygerFrameworkImGuiParamC> c;
+		c.reserve(elements.size());
+		for (auto&& e : elements)
+			c.push_back(TygerFrameworkImGuiParamC{ (int)e.ImGuiElement, e.Text.c_str() });
+		CFunctions()->SetTyFImGuiElements(mInstance->PluginName.c_str(), c.data(), (int)c.size());
 	}
 
 	//Sets all the flags
 	static bool SetTyInputState(TyInputsFlags flags) {
-		return Get()->param()->functions->SetTyInputState(mInstance->PluginName, flags);
+		return CFunctions()->SetTyInputState(mInstance->PluginName.c_str(), (int)flags);
 	}
 
 	//More easily set or unset a flag(s) in some cases
 	static bool SetTyInputFlag(TyInputsFlags flag, bool enableFlag) {
 		if (enableFlag)
-			return Get()->param()->functions->SetTyInputState(mInstance->PluginName, (GetTyInputState() | flag));
+			return CFunctions()->SetTyInputState(mInstance->PluginName.c_str(), (int)(GetTyInputState() | flag));
 		else
-			return Get()->param()->functions->SetTyInputState(mInstance->PluginName, (GetTyInputState() & ~flag));
+			return CFunctions()->SetTyInputState(mInstance->PluginName.c_str(), (int)(GetTyInputState() & ~flag));
 	}
 
 	//Get the input state of the game set by this plugin (the plugin state could still be blocked by another plugin though)
 	static TyInputsFlags GetTyInputState() {
-		return Get()->param()->functions->GetTyInputState(mInstance->PluginName);
+		return (TyInputsFlags)CFunctions()->GetTyInputState(mInstance->PluginName.c_str());
 	}
 
 	//--------------------------
@@ -216,32 +291,84 @@ public:
 	//--------------------------
 
 	static bool AddDrawPluginUI(VoidFunc func) {
-		return Get()->param()->functions->AddDrawPluginUI(mInstance->PluginName, func);
+		return CFunctions()->AddDrawPluginUI(mInstance->PluginName.c_str(), func);
 	}
 
 	static bool AddPluginImGuiWantCaptureMouse(ImGuiWantCaptureMouseFunc func) {
-		return Get()->param()->functions->AddPluginImGuiWantCaptureMouse(mInstance->PluginName, func);
+		return CFunctions()->AddPluginImGuiWantCaptureMouse(mInstance->PluginName.c_str(), func);
 	}
 
 	static bool AddPluginWndProc(WndProcFunc func) {
-		return Get()->param()->functions->AddPluginWndProc(mInstance->PluginName, func);
+		return CFunctions()->AddPluginWndProc(mInstance->PluginName.c_str(), func);
 	}
 
 	static bool AddTickBeforeGame(TickBeforeGameFunc func) {
-		return Get()->param()->functions->AddTickBeforeGame(mInstance->PluginName, func);
+		return CFunctions()->AddTickBeforeGame(mInstance->PluginName.c_str(), func);
 	}
 
 	static bool AddOnTyInitialized(VoidFunc func) {
-		return Get()->param()->functions->AddOnTyInitialized(mInstance->PluginName, func);
+		return CFunctions()->AddOnTyInitialized(mInstance->PluginName.c_str(), func);
 	}
 
 	static bool AddOnTyBeginShutdown(VoidFunc func) {
-		return Get()->param()->functions->AddOnTyBeginShutdown(mInstance->PluginName, func);
+		return CFunctions()->AddOnTyBeginShutdown(mInstance->PluginName.c_str(), func);
 	}
 
 private:
 	static std::unique_ptr<API> mInstance;
 	const TygerFrameworkPluginInitializeParam* mParam;
+	static const TygerFrameworkPluginInitializeParamC* mCParam;   ///< Bound C interface (see BindCInterfaceInternal).
+	/** Returns the bound C function table; throws if the API is not initialized or the C interface is not bound. */
+	static const TygerFrameworkPluginFunctionsC* CFunctions() {
+		if (mInstance == nullptr)
+			throw std::runtime_error("API not initialized");
+		if (mCParam == nullptr || mCParam->functions == nullptr)
+			throw std::runtime_error("TygerFramework C interface not bound (use the TYGERFRAMEWORK_PLUGIN macro)");
+		return mCParam->functions;
+	}
 };
 
 inline std::unique_ptr<API> API::mInstance;
+inline const TygerFrameworkPluginInitializeParamC* API::mCParam = nullptr;
+
+/**
+ * Plugin entry-point macro. Emits the exported extern "C" POD entry points the
+ * framework calls, marshalling between the C wire types and the author's C++
+ * handlers. Use EXACTLY ONCE in a plugin. Handlers stay pure C++:
+ *   versionFn:  void(TygerFrameworkPluginVersion&)
+ *   initFn:     bool(const TygerFrameworkPluginInitializeParam*)
+ *
+ * The emitted TygerFrameworkPluginInitializeC is called once per plugin load. It
+ * uses function-local statics for the C++ init param and the error string so they
+ * remain valid after the shim returns (the framework reads/copies them
+ * immediately). Inside initFn the param's functions field is intentionally null --
+ * use the API:: static methods (which call through the bound C table), never
+ * param->functions.
+ */
+#define TYGERFRAMEWORK_PLUGIN(versionFn, initFn)                                                       \
+	extern "C" __declspec(dllexport)                                                                   \
+	void TygerFrameworkPluginRequiredVersionC(TygerFrameworkPluginVersionC* out) {                     \
+		TygerFrameworkPluginVersion v{};                                                               \
+		(versionFn)(v);                                                                                \
+		out->Major = v.Major;                                                                          \
+		out->Minor = v.Minor;                                                                          \
+		out->Patch = v.Patch;                                                                          \
+		int mask = 0;                                                                                  \
+		for (int g : v.CompatibleGames)                                                                \
+			if (g >= 1 && g <= 31) mask |= (1 << (g - 1));                                            \
+		out->CompatibleGames = mask;                                                                   \
+	}                                                                                                  \
+	extern "C" __declspec(dllexport)                                                                   \
+	const char* TygerFrameworkPluginInitializeC(const TygerFrameworkPluginInitializeParamC* paramC) { \
+		API::BindCInterfaceInternal(paramC);                                                           \
+		static TygerFrameworkPluginInitializeParam sParam{};                                           \
+		sParam.TyHModule = paramC->TyHModule;                                                          \
+		sParam.pluginFileName = paramC->pluginFileName ? paramC->pluginFileName : "";                  \
+		sParam.functions = nullptr;                                                                    \
+		sParam.initErrorMessage.clear();                                                               \
+		bool ok = (initFn)(&sParam);                                                                   \
+		if (ok) return nullptr;                                                                        \
+		static std::string sErr;                                                                       \
+		sErr = sParam.initErrorMessage.empty() ? "Plugin initialization failed" : sParam.initErrorMessage; \
+		return sErr.c_str();                                                                           \
+	}
