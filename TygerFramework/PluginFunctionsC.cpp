@@ -4,6 +4,7 @@
 #include "TygerFramework.h"
 #include "Logger.h"
 #include <vector>
+#include "Minhook.h"
 
 //---- C thunks: convert C types to STL and forward to the existing internals ----
 
@@ -62,6 +63,20 @@ static const char* GetPluginDirC() {
 	return cached.c_str();
 }
 
+static bool CreateHook(void* pTarget, void* pDetour, void** ppOriginal) {
+	if (MH_CreateHook(pTarget, pDetour, ppOriginal) != MH_OK) {
+		return false;
+	}
+	return MH_QueueEnableHook(pTarget) == MH_OK && MH_ApplyQueued() == MH_OK;
+}
+
+static bool DestroyHook(void* pTarget) {
+	if (MH_DisableHook(pTarget) != MH_OK) {
+		return false;
+	}
+	return MH_RemoveHook(pTarget) == MH_OK;
+}
+
 //---- the table + init param ----
 
 TygerFrameworkPluginFunctionsC pluginFunctionsC{
@@ -81,6 +96,8 @@ TygerFrameworkPluginFunctionsC pluginFunctionsC{
 	SetTyInputStateC,
 	GetTyInputStateC,
 	GetPluginDirC,
+	CreateHook,
+	DestroyHook,
 };
 
 TygerFrameworkPluginInitializeParamC pluginInitParamC{
@@ -120,4 +137,12 @@ bool PluginC_TryInitialize(void* pluginModule, void* frameworkModule,
 	outOk = (err == nullptr);
 	outError = (err != nullptr) ? err : "";
 	return true;
+}
+
+extern "C" __declspec(dllexport) bool Framework_CreateHook(void* pTarget, void* pDetour, void** ppOriginal) {
+	return CreateHook(pTarget, pDetour, ppOriginal);
+}
+
+extern "C" __declspec(dllexport) bool Framework_DestroyHook(void* pTarget) {
+	return DestroyHook(pTarget);
 }
