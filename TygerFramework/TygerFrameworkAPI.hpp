@@ -293,12 +293,18 @@ public:
 	//-----------------
 	// Creates and enables a hook using MinHook.
 	static bool CreateHook(void* pTarget, void* pDetour, void** ppOriginal) {
-		if (!pTarget || !pDetour || !ppOriginal) return false;
+		if (!pTarget || !pDetour) {
+			LogPluginMessage("Target and/or Detour Address is a nullptr, Can't Create Hook", Error);
+			return false;
+		}
 		return CFunctions()->CreateHook(pTarget, pDetour, ppOriginal, mInstance->PluginName.c_str());
 	}
 
 	static bool DestroyHook(void* pTarget) {
-		if (!pTarget) return false;
+		if (!pTarget) {
+			LogPluginMessage("Target Address is a nullptr, Can't Destroy Hook", Error);
+			return false;
+		}
 		return CFunctions()->DestroyHook(pTarget, mInstance->PluginName.c_str());
 	}
 
