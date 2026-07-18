@@ -63,18 +63,40 @@ static const char* GetPluginDirC() {
 	return cached.c_str();
 }
 
-static bool CreateHook(void* pTarget, void* pDetour, void** ppOriginal) {
-	if (MH_CreateHook(pTarget, pDetour, ppOriginal) != MH_OK) {
+static bool CreateHook(void* pTarget, void* pDetour, void** ppOriginal, const char* pPluginName) {
+	MH_STATUS minHookStatus = MH_CreateHook(pTarget, pDetour, ppOriginal);
+	if (minHookStatus != MH_OK) {
+		std::string strPluginName = pPluginName ? " for " + std::string(pPluginName) : "";
+		std::string error = MH_StatusToString(minHookStatus);
+		Logger::LogMessage("[API] Failed to Create Function Hook at " + std::to_string((int)pTarget) + strPluginName + ", With the Error : " + error, Error);
 		return false;
 	}
-	return MH_QueueEnableHook(pTarget) == MH_OK && MH_ApplyQueued() == MH_OK;
+	minHookStatus = MH_EnableHook(pTarget);
+	if (minHookStatus != MH_OK) {
+		std::string strPluginName = pPluginName ? " for " + std::string(pPluginName) : "";
+		std::string error = MH_StatusToString(minHookStatus);
+		Logger::LogMessage("[API] Failed to Enable Function Hook at " + std::to_string((int)pTarget) + strPluginName + ", With the Error: " + error, Error);
+		return false;
+	}
+	return true;
 }
 
-static bool DestroyHook(void* pTarget) {
-	if (MH_DisableHook(pTarget) != MH_OK) {
+static bool DestroyHook(void* pTarget, const char* pPluginName) {
+	MH_STATUS minHookStatus = MH_DisableHook(pTarget);
+	if (minHookStatus != MH_OK) {
+		std::string strPluginName = pPluginName ? " for " + std::string(pPluginName) : "";
+		std::string error = MH_StatusToString(minHookStatus);
+		Logger::LogMessage("[API] Failed Disable Function Hook at " + std::to_string((int)pTarget) + strPluginName + ", With the Error : " + error, Error);
 		return false;
 	}
-	return MH_RemoveHook(pTarget) == MH_OK;
+	minHookStatus = MH_RemoveHook(pTarget);
+	if (minHookStatus != MH_OK) {
+		std::string strPluginName = pPluginName ? " for " + std::string(pPluginName) : "";
+		std::string error = MH_StatusToString(minHookStatus);
+		Logger::LogMessage("[API] Failed to Remove Function Hook at " + std::to_string((int)pTarget) + strPluginName + ", With the Error: " + error, Error);
+		return false;
+	}
+	return true;
 }
 
 //---- the table + init param ----
@@ -139,10 +161,12 @@ bool PluginC_TryInitialize(void* pluginModule, void* frameworkModule,
 	return true;
 }
 
-extern "C" __declspec(dllexport) bool Framework_CreateHook(void* pTarget, void* pDetour, void** ppOriginal) {
-	return CreateHook(pTarget, pDetour, ppOriginal);
+// dllexports for dependency dlls, since they don't use the API
+// Functions for dependencies to be able to name the plugin that was trying to use the hook, or the dependency's name, to help with tracking hook errors
+extern "C" __declspec(dllexport) bool Framework_CreateHook(void* pTarget, void* pDetour, void** ppOriginal, const char* pSourceName) {
+	return CreateHook(pTarget, pDetour, ppOriginal, pSourceName);
 }
 
-extern "C" __declspec(dllexport) bool Framework_DestroyHook(void* pTarget) {
-	return DestroyHook(pTarget);
+extern "C" __declspec(dllexport) bool Framework_DestroyHook(void* pTarget, const char* pSourceName) {
+	return DestroyHook(pTarget, pSourceName);
 }

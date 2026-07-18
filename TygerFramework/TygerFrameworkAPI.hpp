@@ -149,8 +149,8 @@ struct TygerFrameworkPluginFunctionsC {
 	bool (*SetTyInputState)(const char* pluginName, int flags);   ///< flags is a TyInputsFlags value.
 	int  (*GetTyInputState)(const char* pluginName);              ///< Returns a TyInputsFlags value.
 	const char* (*GetPluginDir)();   ///< Framework-owned, stable for the plugin lifetime (UTF-8).
-	bool (*CreateHook)(void* pTarget, void* pDetour, void** ppOriginal);
-	bool (*DestroyHook)(void* pTarget);
+	bool (*CreateHook)(void* pTarget, void* pDetour, void** ppOriginal, const char* pPluginName);
+	bool (*DestroyHook)(void* pTarget, const char* pPluginName);
 };
 
 /** C-ABI mirror of TygerFrameworkPluginInitializeParam, passed to the C init entry point. */
@@ -283,7 +283,7 @@ public:
 			return CFunctions()->SetTyInputState(mInstance->PluginName.c_str(), (int)(GetTyInputState() & ~flag));
 	}
 
-	//Get the input state of the game set by this plugin (the plugin state could still be blocked by another plugin though)
+	//Get the input state of the game set by this plugin (the input state could still be blocked by another plugin though)
 	static TyInputsFlags GetTyInputState() {
 		return (TyInputsFlags)CFunctions()->GetTyInputState(mInstance->PluginName.c_str());
 	}
@@ -294,12 +294,12 @@ public:
 	// Creates and enables a hook using MinHook.
 	static bool CreateHook(void* pTarget, void* pDetour, void** ppOriginal) {
 		if (!pTarget || !pDetour || !ppOriginal) return false;
-		return CFunctions()->CreateHook(pTarget, pDetour, ppOriginal);
+		return CFunctions()->CreateHook(pTarget, pDetour, ppOriginal, mInstance->PluginName.c_str());
 	}
 
 	static bool DestroyHook(void* pTarget) {
 		if (!pTarget) return false;
-		return CFunctions()->DestroyHook(pTarget);
+		return CFunctions()->DestroyHook(pTarget, mInstance->PluginName.c_str());
 	}
 
 	//--------------------------
